@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0c1018;
+  --color-foreground: #e8eaee;
+  --color-card: #141a24;
+  --color-card-foreground: #e8eaee;
+  --color-muted: #1b2230;
+  --color-muted-foreground: #8b93a1;
+  --color-primary: #e8eaee;
+  --color-primary-foreground: #0c1018;
+  --color-accent: #7ea0c4;
+  --color-accent-foreground: #0c1018;
+  --color-border: color-mix(in oklab, #e8eaee 12%, transparent);
+  --color-ring: #7ea0c4;
+  --color-destructive: #c47a7a;
+
+  --font-sans: "IBM Plex Sans JP", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-display: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-border: 0 0 0 1px color-mix(in oklab, #e8eaee 8%, transparent);
+  --shadow-border-hover: 0 0 0 1px color-mix(in oklab, #e8eaee 14%, transparent);
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    background-image:
+      linear-gradient(
+        90deg,
+        color-mix(in oklab, var(--color-accent) 7%, transparent) 0,
+        transparent 28%
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 55px,
+        color-mix(in oklab, var(--color-foreground) 3.5%, transparent) 55px,
+        color-mix(in oklab, var(--color-foreground) 3.5%, transparent) 56px
+      );
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    font-family: var(--font-display);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 40%, transparent);
+    color: var(--color-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
