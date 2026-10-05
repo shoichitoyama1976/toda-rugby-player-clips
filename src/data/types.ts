@@ -69,6 +69,10 @@ export type Player = {
   university?: string;
   previousTeam?: string;
   nickname?: string;
+  sutoCall?: string;
+  xUrl?: string;
+  instagramUrl?: string;
+  noteUrl?: string;
   profileUrl?: string;
   unlisted?: boolean;
   related?: boolean;
@@ -185,39 +189,63 @@ export const SHEET_SEASON_HEADERS = ["シーズン", "season"] as const;
 
 export const SHEET_TEMPLATE_CSV = [
   "ID,掲載年月日,掲載媒体,タイトル,URL",
-  "12,2026-02-06,note,競技人生の分岐点とラグビーの醐醇味（前編）,https://note.com/example/n/abc",
+  "12,2026-02-06,note,競技人生の分岐点とラグビーの醍醐味（前編）,https://note.com/example/n/abc",
 ].join("\n");
 
 export const PLAYER_SHEET_COLUMNS = [
-  { key: "sheetId", headers: ["ID", "id"], required: true, example: "1" },
-  { key: "name", headers: ["名前", "氏名", "選手名", "name"], required: true, example: "（例）" },
+  { key: "sheetId", headers: ["ID", "id"], required: true, example: "22" },
+  { key: "name", headers: ["名前", "氏名", "選手名", "name"], required: true, example: "土井將聖" },
   { key: "category", headers: ["属性", "区分"], required: false, example: "選手" },
-  { key: "nameKana", headers: ["ふりがな", "かな", "カナ", "フリガナ", "読み", "よみがな"], required: false, example: "" },
+  { key: "nameKana", headers: ["ふりがな", "かな", "カナ", "フリガナ", "読み", "よみがな"], required: false, example: "どい まさとし" },
   { key: "nickname", headers: ["ニックネーム", "愛称"], required: false, example: "" },
-  { key: "position", headers: ["ポジション", "position", "ポジ"], required: false, example: "PR" },
-  { key: "heightCm", headers: ["身長", "height"], required: false, example: "180" },
-  { key: "weightKg", headers: ["体重", "weight"], required: false, example: "100" },
-  { key: "origin", headers: ["出身地", "出身", "出身県"], required: false, example: "" },
+  {
+    key: "sutoCall",
+    headers: ["須藤選手ならこう呼ぶ", "須藤ならこう呼ぶ", "須藤呼び", "須藤呼称"],
+    required: false,
+    example: "かい～",
+  },
+  { key: "position", headers: ["ポジション", "position", "ポジ"], required: false, example: "WTB" },
+  { key: "heightCm", headers: ["身長", "height"], required: false, example: "173" },
+  { key: "weightKg", headers: ["体重", "weight"], required: false, example: "80" },
+  { key: "origin", headers: ["出身地", "出身", "出身県"], required: false, example: "大阪府" },
   {
     key: "rugbySchool",
     headers: ["ラグビースクール", "所属ラグビースクール", "ジュニア"],
     required: false,
     example: "",
   },
-  { key: "highSchool", headers: ["高校", "出身高校", "高等学校"], required: false, example: "" },
-  { key: "university", headers: ["大学", "出身大学"], required: false, example: "" },
+  { key: "highSchool", headers: ["高校", "出身高校", "高等学校"], required: false, example: "常翔啓光学園" },
+  { key: "university", headers: ["大学", "出身大学"], required: false, example: "立正大学" },
   { key: "previousTeam", headers: ["経歴", "前所属", "前所属チーム", "前所属クラブ"], required: false, example: "" },
-  { key: "birthday", headers: ["生年月日", "誕生日", "birthday"], required: false, example: "1990-01-01" },
+  { key: "birthday", headers: ["生年月日", "誕生日", "birthday"], required: false, example: "1997-09-26" },
   { key: "joined", headers: ["加入年度", "加入", "加入年", "入団"], required: false, example: "2020" },
   { key: "school", headers: ["学歴", "学校"], required: false, example: "○○高校→△△大学" },
   { key: "status", headers: ["在籍", "所属", "状態", "ステータス"], required: false, example: "在籍" },
-  { key: "captain", headers: ["主将", "キャプテン"], required: false, example: "" },
-  { key: "aliases", headers: ["別名", "旧名", "英語名"], required: false, example: "" },
+  { key: "captain", headers: ["主将", "キャプテン"], required: false, example: "共同" },
+  { key: "aliases", headers: ["別名", "旧名", "英語名"], required: false, example: "Masakiyo Doi" },
+  {
+    key: "xUrl",
+    headers: ["X", "X.com", "SNS X.com", "Twitter"],
+    required: false,
+    example: "https://x.com/example",
+  },
+  {
+    key: "instagramUrl",
+    headers: ["Instagram", "インスタグラム", "インスタ"],
+    required: false,
+    example: "https://www.instagram.com/example",
+  },
+  {
+    key: "noteUrl",
+    headers: ["note", "note.com", "ノート"],
+    required: false,
+    example: "https://note.com/example",
+  },
 ] as const;
 
 export const PLAYER_SHEET_TEMPLATE_CSV = [
   "ID,名前,属性,ふりがな,ニックネーム,ポジション,身長,体重,国,出身地,ラグビースクール,高校,大学,経歴,生年月日,加入年度,退団年度",
-  ",（例）,,,,,,,,,,,,,,",
+  "22,土井將聖,選手,どい まさとし,,WTB,173,80,JP,大阪府,,常翔啓光学園,立正大学,,1997-09-26,2020,",
 ].join("\n");
 
 export const ARTICLE_TAB_NAMES = ["掲載記事一覧", "記事一覧", "記事", "Articles", "articles", "Clips", "clips"] as const;
