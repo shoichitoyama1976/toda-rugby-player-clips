@@ -40,12 +40,26 @@ export function clipCount(articles: Article[], player: Player): number {
   return articlesForPlayer(articles, player.slug, player).length;
 }
 
+const PUBLIC_ORIGIN = "https://toda-rugby-player-clips.grok.me";
+
+function headerHosts(value: string | null): string[] {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
 export function requestOrigin(request: Request): string {
   const headers = request.headers;
-  const host = headers.get("x-forwarded-host") ?? headers.get("host") ?? "localhost:8080";
+  const hosts = [...headerHosts(headers.get("x-forwarded-host")), ...headerHosts(headers.get("host"))];
+  const grok = hosts.find((host) => host === "grok.me" || host.endsWith(".grok.me"));
+  if (grok) return `https://${grok}`;
+  const host = hosts[0] ?? "localhost:8080";
+  if (host.endsWith(".vercel.app")) return PUBLIC_ORIGIN;
   const forwarded = headers.get("x-forwarded-proto");
-  const proto = forwarded ?? (host.includes("localhost") || host.startsWith("127.") ? "http" : "https");
-  return `${proto}://${host.split(",")[0]?.trim()}`;
+  const proto = forwarded?.split(",")[0]?.trim() ?? (host.includes("localhost") || host.startsWith("127.") ? "http" : "https");
+  return `${proto}://${host}`;
 }
 
 export function escapeXml(value: string): string {
@@ -58,9 +72,9 @@ export function escapeXml(value: string): string {
 }
 
 export const loadRequestOrigin = createServerFn({ method: "GET" }).handler(async () => {
-  const { getRequestUrl } = await import("@tanstack/react-start/server");
+  const { getRequest } = await import("@tanstack/react-start/server");
   try {
-    return getRequestUrl({ xForwardedHost: true, xForwardedProto: true }).origin;
+    return requestOrigin(getRequest());
   } catch {
     return "";
   }

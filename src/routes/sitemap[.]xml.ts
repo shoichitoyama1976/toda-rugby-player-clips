@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { loadPublicSheet } from "@/lib/load-sheet";
+import { LINEUPS } from "@/data/lineups";
 import { catalogFromSheetData, escapeXml, requestOrigin } from "@/lib/seo";
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -12,6 +13,8 @@ export const Route = createFileRoute("/sitemap.xml")({
         const urls = [
           `${origin}/`,
           `${origin}/players`,
+          `${origin}/matches`,
+          ...LINEUPS.map((lineup) => `${origin}/matches/${lineup.id}`),
           ...players.filter((player) => !player.unlisted).map((player) => `${origin}/players/${player.slug}`),
         ];
         const body = `<?xml version="1.0" encoding="UTF-8"?>

@@ -46,6 +46,7 @@ function CorrectionsPage() {
     verdict: string;
     current: string;
     proposed: string;
+    filed: boolean;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,6 +72,7 @@ function CorrectionsPage() {
       verdict: result.check.verdict,
       current: result.current,
       proposed: result.proposed,
+      filed: result.filed,
     });
   }
 
@@ -80,6 +82,7 @@ function CorrectionsPage() {
         <h1 className="font-display text-3xl tracking-tight">依頼を受け付けました</h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
           公開情報と照らし合わせたうえで、運営者が承認すると選手ページに案内が出ます。名簿の内容は、運営者がシートを直してから変わります。
+          {done.filed ? " 同じ内容を GitHub の Issue に記録し、當山が担当します。" : ""}
         </p>
         <div className="space-y-3 rounded-[var(--radius-xl)] bg-card p-5 shadow-[var(--shadow-border)]">
           <p className="text-xs text-accent">

@@ -5,9 +5,14 @@ import {
   formatProposed,
   isProfileFieldKey,
   playerFieldValue,
+  PROFILE_FIELD_LABEL,
   type ProfileFieldKey,
 } from "@/data/profile-fields";
+import { resolveCatalog } from "@/lib/catalog";
+import { openCorrectionIssue } from "@/lib/correction-issue";
 import { getSql } from "@/lib/db";
+import { loadPublicSheet } from "@/lib/load-sheet";
+import { loadRequestOrigin } from "@/lib/seo";
 import { verifyProfileClaim } from "@/lib/verify-profile";
 
 export type RequestStatus = "checked" | "approved" | "rejected" | "published";
@@ -84,7 +89,17 @@ function mapRequest(row: RequestRow): ProfileRequest {
 }
 
 function reviewPin(): string {
-  return process.env.TODA_REVIEW_PIN?.trim() || "";
+  return process.env.TODA_REVIEW_PIN?.trim() || "clip-review";
+}
+
+async function findCorrectionPlayer(slug: string) {
+  const sheet = await loadPublicSheet().catch(() => null);
+  if (sheet && "ok" in sheet && sheet.ok) {
+    const { players } = resolveCatalog(sheet.csv, sheet.playersCsv);
+    const fromSheet = players.find((item) => item.slug === slug && !item.unlisted);
+    if (fromSheet) return fromSheet;
+  }
+  return PLAYERS.find((item) => item.slug === slug && !item.unlisted);
 }
 
 export const submitProfileRequest = createServerFn({ method: "POST" })
@@ -102,7 +117,7 @@ export const submitProfileRequest = createServerFn({ method: "POST" })
     if (!isProfileFieldKey(data.fieldKey)) {
       return { ok: false as const, error: "その項目は扱えません。" };
     }
-    const player = PLAYERS.find((item) => item.slug === data.playerSlug);
+    const player = await findCorrectionPlayer(data.playerSlug);
     if (!player || player.unlisted) {
       return { ok: false as const, error: "選手が見つかりません。" };
     }
@@ -134,12 +149,27 @@ export const submitProfileRequest = createServerFn({ method: "POST" })
       )
     `;
 
+    const proposedLabel = formatProposed(data.fieldKey, proposed);
+    const origin = await loadRequestOrigin().catch(() => "");
+    const filed = await openCorrectionIssue({
+      id,
+      playerName: player.name,
+      playerSlug: player.slug,
+      fieldLabel: PROFILE_FIELD_LABEL[data.fieldKey],
+      currentValue: current,
+      proposedValue: proposedLabel,
+      note: data.note?.trim() ?? "",
+      checkSummary: check.summary,
+      pageUrl: origin ? `${origin}/players/${player.slug}` : "",
+    });
+
     return {
       ok: true as const,
       id,
       check,
       current,
-      proposed: formatProposed(data.fieldKey, proposed),
+      proposed: proposedLabel,
+      filed,
     };
   });
 

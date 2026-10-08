@@ -5,8 +5,10 @@ import { ArticleCard } from "@/components/article-card";
 import { JsonLd } from "@/components/json-ld";
 import { PlayerCard } from "@/components/player-card";
 import { Input } from "@/components/ui/input";
+import { lineupsNewestFirst } from "@/data/lineups";
 import { POSITIONS } from "@/data/types";
 import { searchPlayers } from "@/lib/catalog";
+import { formatDate } from "@/lib/format";
 import { websiteJsonLd } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
 
@@ -23,6 +25,7 @@ function Home() {
     .filter((row) => row.count > 0);
   const sources = new Set(articles.map((a) => a.sourceLabel)).size;
   const siteLd = websiteJsonLd(origin);
+  const nextMatch = lineupsNewestFirst()[0];
 
   const roster = useMemo(() => {
     const current = players.filter(
@@ -71,6 +74,24 @@ function Home() {
           </p>
         )}
       </section>
+
+      {nextMatch ? (
+        <Link
+          to="/matches/$id"
+          params={{ id: nextMatch.id }}
+          className="block rounded-[var(--radius-xl)] bg-card p-5 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
+        >
+          <p className="text-[11px] tracking-[0.18em] text-accent">試合メンバーから記事へ</p>
+          <p className="mt-2 font-display text-2xl leading-tight">vs {nextMatch.opponent}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {formatDate(nextMatch.date)} {nextMatch.kickoff} K.O. · {nextMatch.venue}
+          </p>
+          <p className="mt-3 inline-flex items-center gap-1 text-sm text-foreground">
+            出場メンバーを見る
+            <ArrowRight className="size-3.5" />
+          </p>
+        </Link>
+      ) : null}
 
       <section className="grid grid-cols-3 gap-3">
         <Stat label="選手" value={coveredAll.length} to="/players" />

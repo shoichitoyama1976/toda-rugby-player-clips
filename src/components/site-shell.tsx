@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/players", label: "選手" },
+  { to: "/matches", label: "メンバー" },
   { to: "/articles", label: "記事" },
   { to: "/", label: "ホーム" },
   { to: "/corrections", label: "修正依頼" },

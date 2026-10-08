@@ -20,6 +20,8 @@ import { Route as SourceRouteImport } from './routes/source'
 import { Route as SourcesRouteImport } from './routes/sources'
 import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
 import { Route as ArticlesIdRouteImport } from './routes/articles.$id'
+import { Route as MatchesIndexRouteImport } from './routes/matches.index'
+import { Route as MatchesIdRouteImport } from './routes/matches.$id'
 import { Route as PlayersIndexRouteImport } from './routes/players.index'
 import { Route as PlayersSlugRouteImport } from './routes/players.$slug'
 
@@ -78,6 +80,16 @@ const ArticlesIdRoute = ArticlesIdRouteImport.update({
   path: '/articles/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MatchesIndexRoute = MatchesIndexRouteImport.update({
+  id: '/matches/',
+  path: '/matches/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatchesIdRoute = MatchesIdRouteImport.update({
+  id: '/matches/$id',
+  path: '/matches/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlayersIndexRoute = PlayersIndexRouteImport.update({
   id: '/players/',
   path: '/players/',
@@ -100,8 +112,10 @@ export interface FileRoutesByFullPath {
   '/source': typeof SourceRoute
   '/sources': typeof SourcesRoute
   '/articles/$id': typeof ArticlesIdRoute
+  '/matches/$id': typeof MatchesIdRoute
   '/players/$slug': typeof PlayersSlugRoute
   '/articles/': typeof ArticlesIndexRoute
+  '/matches/': typeof MatchesIndexRoute
   '/players/': typeof PlayersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -115,8 +129,10 @@ export interface FileRoutesByTo {
   '/source': typeof SourceRoute
   '/sources': typeof SourcesRoute
   '/articles/$id': typeof ArticlesIdRoute
+  '/matches/$id': typeof MatchesIdRoute
   '/players/$slug': typeof PlayersSlugRoute
   '/articles': typeof ArticlesIndexRoute
+  '/matches': typeof MatchesIndexRoute
   '/players': typeof PlayersIndexRoute
 }
 export interface FileRoutesById {
@@ -131,8 +147,10 @@ export interface FileRoutesById {
   '/source': typeof SourceRoute
   '/sources': typeof SourcesRoute
   '/articles/$id': typeof ArticlesIdRoute
+  '/matches/$id': typeof MatchesIdRoute
   '/players/$slug': typeof PlayersSlugRoute
   '/articles/': typeof ArticlesIndexRoute
+  '/matches/': typeof MatchesIndexRoute
   '/players/': typeof PlayersIndexRoute
 }
 export interface FileRouteTypes {
@@ -148,8 +166,10 @@ export interface FileRouteTypes {
     | '/source'
     | '/sources'
     | '/articles/$id'
+    | '/matches/$id'
     | '/players/$slug'
     | '/articles/'
+    | '/matches/'
     | '/players/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -163,8 +183,10 @@ export interface FileRouteTypes {
     | '/source'
     | '/sources'
     | '/articles/$id'
+    | '/matches/$id'
     | '/players/$slug'
     | '/articles'
+    | '/matches'
     | '/players'
   id:
     | '__root__'
@@ -178,8 +200,10 @@ export interface FileRouteTypes {
     | '/source'
     | '/sources'
     | '/articles/$id'
+    | '/matches/$id'
     | '/players/$slug'
     | '/articles/'
+    | '/matches/'
     | '/players/'
   fileRoutesById: FileRoutesById
 }
@@ -194,8 +218,10 @@ export interface RootRouteChildren {
   SourceRoute: typeof SourceRoute
   SourcesRoute: typeof SourcesRoute
   ArticlesIdRoute: typeof ArticlesIdRoute
+  MatchesIdRoute: typeof MatchesIdRoute
   PlayersSlugRoute: typeof PlayersSlugRoute
   ArticlesIndexRoute: typeof ArticlesIndexRoute
+  MatchesIndexRoute: typeof MatchesIndexRoute
   PlayersIndexRoute: typeof PlayersIndexRoute
 }
 
@@ -278,6 +304,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArticlesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/matches/': {
+      id: '/matches/'
+      path: '/matches'
+      fullPath: '/matches/'
+      preLoaderRoute: typeof MatchesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matches/$id': {
+      id: '/matches/$id'
+      path: '/matches/$id'
+      fullPath: '/matches/$id'
+      preLoaderRoute: typeof MatchesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/players/': {
       id: '/players/'
       path: '/players'
@@ -306,8 +346,10 @@ const rootRouteChildren: RootRouteChildren = {
   SourceRoute: SourceRoute,
   SourcesRoute: SourcesRoute,
   ArticlesIdRoute: ArticlesIdRoute,
+  MatchesIdRoute: MatchesIdRoute,
   PlayersSlugRoute: PlayersSlugRoute,
   ArticlesIndexRoute: ArticlesIndexRoute,
+  MatchesIndexRoute: MatchesIndexRoute,
   PlayersIndexRoute: PlayersIndexRoute,
 }
 export const routeTree = rootRouteImport

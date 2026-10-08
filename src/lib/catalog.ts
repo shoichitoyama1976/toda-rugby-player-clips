@@ -42,7 +42,9 @@ type NameIndex = Array<{ key: string; slug: string }>;
 
 function buildNameIndex(players: Player[]): NameIndex {
   return players.flatMap((p) =>
-    [p.name, ...p.aliases].map((alias) => ({ key: foldName(alias), slug: p.slug })),
+    [p.name, p.nameKana, p.nickname, p.sutoCall, ...p.aliases]
+      .filter((alias): alias is string => Boolean(alias?.trim()))
+      .map((alias) => ({ key: foldName(alias), slug: p.slug })),
   );
 }
 
@@ -702,7 +704,9 @@ export function resolveCatalog(
 }
 
 export function articlesForPlayer(articles: Article[], slug: string, player: Player): Article[] {
-  const keys = new Set([foldName(player.name), ...player.aliases.map(foldName)]);
+  const keys = new Set(
+    [player.name, player.nameKana, ...player.aliases].filter(Boolean).map((name) => foldName(name)),
+  );
   return articles.filter(
     (article) =>
       article.playerSlugs.includes(slug) ||
