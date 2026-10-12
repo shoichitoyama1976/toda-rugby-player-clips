@@ -34,7 +34,7 @@ function blobSha(body: Buffer): string {
 }
 
 function skipped(path: string): boolean {
-  if (SKIP.has(path)) return true;
+  if (path.startsWith("public/__grok/")) return true;
   const name = path.toLowerCase();
   return (
     name.includes(".env") ||
