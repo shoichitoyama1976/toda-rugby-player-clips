@@ -1,22 +1,43 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bookmark, Menu, Newspaper, Users, X } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { Menu, Newspaper, Users, X } from "lucide-react";
+import { useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useClipStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/players", label: "選手" },
-  { to: "/matches", label: "メンバー" },
-  { to: "/articles", label: "記事" },
   { to: "/", label: "ホーム" },
+  { to: "/matches", label: "試合" },
+  { to: "/players", label: "選手" },
+  { to: "/articles", label: "記事" },
+  { to: "/saved", label: "保存した記事" },
+  { to: "/about", label: "このサイトについて" },
   { to: "/corrections", label: "修正依頼" },
-  { to: "/about", label: "このサイト" },
 ] as const;
+
+function navActive(pathname: string, to: string): boolean {
+  if (to === "/") return pathname === "/";
+  return pathname === to || pathname.startsWith(`${to}/`);
+}
+
+const OUTDOOR_KEY = "outdoor-display";
+
+function applyOutdoor(on: boolean) {
+  document.documentElement.setAttribute("data-outdoor", on ? "1" : "0");
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", on ? "#f4f1e8" : "#0c1018");
+}
 
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const [outdoor, setOutdoor] = useState(false);
+
+  useLayoutEffect(() => {
+    const on = localStorage.getItem(OUTDOOR_KEY) === "1";
+    setOutdoor(on);
+    applyOutdoor(on);
+  }, []);
 
   useEffect(() => {
     setOpen(false);
@@ -41,18 +62,16 @@ export function SiteShell({ children }: { children: ReactNode }) {
               Lovins Clips Connect With Levins
             </span>
           </Link>
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center gap-1 lg:flex">
             {NAV.map((item) => {
-              const active =
-                item.to === "/"
-                  ? pathname === "/"
-                  : pathname === item.to || pathname.startsWith(`${item.to}/`);
+              const active = navActive(pathname, item.to);
               return (
                 <Link
                   key={item.to}
                   to={item.to}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex h-11 items-center px-3 text-sm transition-colors",
+                    "flex h-11 items-center px-2 text-sm transition-colors",
                     active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                   )}
                 >
@@ -60,18 +79,25 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
-            <Link
-              to="/saved"
-              className="flex size-11 items-center justify-center text-muted-foreground hover:text-foreground"
-              aria-label="保存した記事"
-            >
-              <Bookmark className="size-4" />
-            </Link>
           </nav>
+          <button
+            type="button"
+            aria-pressed={outdoor}
+            aria-label={outdoor ? "通常の表示に戻す" : "屋外向けの明るい表示にする"}
+            onClick={() => {
+              const next = !outdoor;
+              setOutdoor(next);
+              localStorage.setItem(OUTDOOR_KEY, next ? "1" : "0");
+              applyOutdoor(next);
+            }}
+            className="flex h-11 shrink-0 items-center px-2 text-sm text-foreground"
+          >
+            {outdoor ? "通常" : "屋外"}
+          </button>
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="lg:hidden"
             aria-label={open ? "メニューを閉じる" : "メニューを開く"}
             onClick={() => setOpen((v) => !v)}
           >
@@ -79,20 +105,24 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </Button>
         </div>
         {open ? (
-          <div className="border-t border-border bg-background px-4 py-3 md:hidden">
+          <div className="border-t border-border bg-background px-4 py-3 lg:hidden">
             <div className="grid gap-1">
-              {NAV.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className="flex h-11 items-center text-sm text-foreground"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <Link to="/saved" className="flex h-11 items-center text-sm text-foreground">
-                保存した記事
-              </Link>
+              {NAV.map((item) => {
+                const active = navActive(pathname, item.to);
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex h-11 items-center text-sm",
+                      active ? "text-foreground" : "text-muted-foreground",
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         ) : null}

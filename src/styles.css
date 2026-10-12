@@ -79,6 +79,31 @@
   }
 }
 
+/* 屋外の強い光向け。白い紙に近い地に、濃い文字。 */
+html[data-outdoor="1"] {
+  --color-background: #f4f1e8;
+  --color-foreground: #14181f;
+  --color-card: #fffdf8;
+  --color-card-foreground: #14181f;
+  --color-muted: #e4dfd2;
+  --color-muted-foreground: #2c323c;
+  --color-primary: #14181f;
+  --color-primary-foreground: #f4f1e8;
+  --color-accent: #1a4f82;
+  --color-accent-foreground: #f4f1e8;
+  --color-border: #b7b1a3;
+  --color-ring: #1a4f82;
+  --shadow-border: 0 0 0 1px #b7b1a3;
+  --shadow-border-hover: 0 0 0 1px #14181f;
+  color-scheme: light;
+  font-size: 18px;
+}
+
+html[data-outdoor="1"] body {
+  background-color: #f4f1e8;
+  background-image: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

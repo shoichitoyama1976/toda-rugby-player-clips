@@ -1,15 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { lineupById, type LineupSlot, type LineupUnit } from "@/data/lineups";
+import type { LineupSlot, LineupUnit } from "@/data/lineups";
 import { matchPlayerSlug } from "@/lib/catalog";
 import { formatDate } from "@/lib/format";
-import { SITE_NAME } from "@/lib/seo";
+import { catalogFromHeadMatches, SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/matches/$id")({
   component: MatchPage,
-  head: ({ params }) => {
-    const lineup = lineupById(params.id);
+  head: ({ params, matches }) => {
+    const { lineups } = catalogFromHeadMatches(matches);
+    const lineup = lineups.find((item) => item.id === params.id);
     const title = lineup
       ? `${formatDate(lineup.date)} vs ${lineup.opponent}｜${SITE_NAME}`
       : `試合が見つかりません｜${SITE_NAME}`;
@@ -25,8 +26,8 @@ const UNITS: Array<{ id: LineupUnit; label: string }> = [
 
 function MatchPage() {
   const { id } = Route.useParams();
-  const lineup = lineupById(id);
-  const { players, countBySlug } = useCatalog();
+  const { players, countBySlug, lineups } = useCatalog();
+  const lineup = lineups.find((item) => item.id === id);
 
   if (!lineup) {
     return (
@@ -39,6 +40,9 @@ function MatchPage() {
     );
   }
 
+  const sourceUrl = lineup.postUrl;
+  const day = lineup.weekday || weekday(lineup.date);
+
   return (
     <div className="space-y-6">
       <header className="max-w-2xl">
@@ -46,20 +50,27 @@ function MatchPage() {
         <h1 className="mt-2 font-display text-3xl leading-tight tracking-tight sm:text-4xl">
           vs {lineup.opponent}
         </h1>
-        <p className="mt-3 text-sm text-foreground">
-          {formatDate(lineup.date)}（{weekday(lineup.date)}）{lineup.kickoff} K.O.
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">{lineup.venue}</p>
+        <div className="mt-3 space-y-1 text-sm text-muted-foreground">
+          <p>
+            {formatDate(lineup.date)}（{day}）
+          </p>
+          <p>{lineup.kickoff} K.O.</p>
+          <p>{lineup.venue}</p>
+        </div>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          名前をタップすると、その選手の記事一覧へ進みます。公式の画像投稿を読み取った一覧で、出場は変わることがあります。
+          名前をタップすると、その選手の記事一覧へ進みます。下の参照元が、このメンバーの元の投稿です。
         </p>
+        <p className="mt-4 text-[11px] tracking-[0.18em] text-muted-foreground">参照元</p>
         <a
-          href={lineup.postUrl}
+          href={sourceUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-2 inline-flex h-11 items-center text-sm text-accent hover:text-foreground"
+          className="mt-1 inline-flex min-h-11 items-center gap-2 text-sm text-accent hover:text-foreground"
         >
-          公式の投稿を見る
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="size-[18px] fill-current">
+            <path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z" />
+          </svg>
+          レビンズの公式Xの投稿を開く
         </a>
       </header>
 
@@ -96,7 +107,9 @@ function SlotRow({
   countBySlug: Map<string, number>;
 }) {
   const slug = matchPlayerSlug(slot.name, players);
-  const player = slug ? players.find((item) => item.slug === slug) : undefined;
+  const player =
+    (slot.playerId ? players.find((item) => item.sheetId === slot.playerId) : undefined) ??
+    (slug ? players.find((item) => item.slug === slug) : undefined);
   const count = player ? (countBySlug.get(player.slug) ?? 0) : 0;
   const reading = nameAside(slot.name, player?.name, player?.nameKana);
   const className = cn(
@@ -111,6 +124,7 @@ function SlotRow({
       <span className="min-w-0 flex-1">
         <span className="block text-base leading-snug">
           {slot.name}
+          {slot.captain ? <span className="text-accent">（C）</span> : null}
           {reading ? <span className="text-muted-foreground"> （{reading}）</span> : null}
         </span>
         {slot.shirt ? (
@@ -141,9 +155,12 @@ function SlotRow({
 }
 
 function nameAside(shown: string, rosterName?: string, kana?: string): string | null {
-  if (/[\u3400-\u9fff]/.test(shown)) return kana?.trim() || null;
+  const reading = kana?.trim();
+  if (/[\u3400-\u9fff]/.test(shown)) return reading || null;
+  if (/[A-Za-z]/.test(shown) && reading && !/[A-Za-z]/.test(reading)) return reading;
+  if (reading && /[A-Za-z]/.test(reading) && /[\u30a0-\u30ff]/.test(shown)) return reading;
   const alphabet = rosterName?.trim();
-  if (!alphabet || !/[A-Za-z]/.test(alphabet)) return null;
+  if (!alphabet || !/[A-Za-z]/.test(alphabet) || alphabet === shown.trim()) return null;
   if (!/[\u30a0-\u30ff]/.test(shown)) return null;
   return alphabet;
 }

@@ -19,15 +19,21 @@ function isStaffOrRelated(player: Player): boolean {
   return Boolean(player.related);
 }
 
-function listRank(player: Player): number {
-  if (isRosterPlayer(player) && player.status === "former") return 2;
-  if (!isRosterPlayer(player)) return 1;
-  return 0;
+const POSITION_ORDER = new Map(POSITIONS.map((item, index) => [item, index]));
+
+function groupRank(player: Player): number {
+  if (isStaffOrRelated(player)) return 2;
+  if (!isRosterPlayer(player)) return 3;
+  return POSITION_UNIT[player.position] === "BK" ? 1 : 0;
 }
 
-function joinedYear(player: Player): number {
-  const year = Number(player.joined);
-  return player.joined && Number.isFinite(year) ? year : Number.POSITIVE_INFINITY;
+function statusRank(player: Player): number {
+  return player.status === "former" ? 1 : 0;
+}
+
+function positionRank(player: Player): number {
+  if (!isRosterPlayer(player)) return POSITION_ORDER.size;
+  return POSITION_ORDER.get(player.position) ?? POSITION_ORDER.size;
 }
 
 function PlayersPage() {
@@ -35,7 +41,6 @@ function PlayersPage() {
   const [query, setQuery] = useState("");
   const [unit, setUnit] = useState<"all" | "FW" | "BK" | "other">("all");
   const [position, setPosition] = useState<Position | "all">("all");
-  const [onlyCovered, setOnlyCovered] = useState(false);
   const [joined, setJoined] = useState<"all" | string>("all");
 
   const years = useMemo(() => {
@@ -57,15 +62,16 @@ function PlayersPage() {
         position === "all" ? true : !player.related && !player.unlisted && player.position === position,
       )
       .filter((player) => (joined === "all" ? true : player.joined === joined))
-      .filter((player) => (onlyCovered ? (countBySlug.get(player.slug) ?? 0) > 0 : true))
       .sort((a, b) => {
-        const byGroup = listRank(a) - listRank(b);
+        const byStatus = statusRank(a) - statusRank(b);
+        if (byStatus !== 0) return byStatus;
+        const byGroup = groupRank(a) - groupRank(b);
         if (byGroup !== 0) return byGroup;
-        const byYear = joinedYear(a) - joinedYear(b);
-        if (byYear !== 0) return byYear;
+        const byPosition = positionRank(a) - positionRank(b);
+        if (byPosition !== 0) return byPosition;
         return a.name.localeCompare(b.name, "ja");
       });
-  }, [players, query, unit, position, joined, onlyCovered, countBySlug]);
+  }, [players, query, unit, position, joined]);
 
   const positions =
     unit === "FW" || unit === "BK" ? POSITIONS.filter((p) => POSITION_UNIT[p] === unit) : POSITIONS;
@@ -107,16 +113,6 @@ function PlayersPage() {
             {item.label}
           </button>
         ))}
-        <button
-          type="button"
-          onClick={() => setOnlyCovered((v) => !v)}
-          className={cn(
-            "h-11 shrink-0 rounded-full px-3 text-xs",
-            onlyCovered ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground",
-          )}
-        >
-          記事あり
-        </button>
       </div>
       {unit === "other" ? null : (
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">

@@ -87,52 +87,48 @@ function PlayerPage() {
         ? "ス"
         : player.position;
 
+  const roleLine = player.role
+    ? player.role
+    : player.related
+      ? (player.category ?? "スタッフ")
+      : player.unlisted
+        ? "名簿外"
+        : `${POSITION_UNIT[player.position]} · ${POSITION_LABEL[player.position]}`;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {personLd ? <JsonLd data={personLd} /> : null}
-      <header className="rounded-[var(--radius-xl)] bg-card p-5 shadow-[var(--shadow-border)]">
-        <div className="flex items-start gap-4">
-          <div className="flex size-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-muted font-display text-sm text-accent">
-            {mark}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[11px] tracking-[0.18em] text-accent">
-              {player.role
-                ? player.role
-                : player.related
-                  ? player.category ?? "スタッフ"
-                  : player.unlisted
-                    ? "名簿外"
-                    : `${POSITION_UNIT[player.position]} · ${POSITION_LABEL[player.position]}`}
-            </p>
-            <h1 className="mt-1 font-display text-4xl font-medium leading-tight tracking-tight">
-              {player.name}
-            </h1>
-            {player.nameKana ? (
-              <p className="mt-1 text-sm text-muted-foreground">{player.nameKana}</p>
-            ) : null}
-            <div className="mt-3 flex flex-wrap gap-2">
-              {player.category && player.category !== "選手" ? <Badge>{player.category}</Badge> : null}
-              {player.captain ? <Badge tone="solid">共同キャプテン</Badge> : null}
-              {!player.unlisted && !player.related && player.status === "former" ? (
-                <Badge>過去所属</Badge>
-              ) : null}
-            </div>
-          </div>
-          <div className="shrink-0 text-right">
-            <p className="text-[11px] text-muted-foreground">掲載</p>
-            <p className="font-display text-3xl tabular-nums leading-none">{clips.length}</p>
-          </div>
+      <header className="border-b border-border pb-6">
+        <div className="flex items-baseline justify-between gap-4">
+          <p className="text-[11px] tracking-[0.22em] text-accent">{roleLine}</p>
+          <p className="font-display text-sm tracking-[0.2em] text-muted-foreground">{mark}</p>
         </div>
+        <h1 className="mt-4 break-words font-display text-4xl font-medium leading-[1.1] tracking-tight sm:text-5xl">
+          {player.name}
+        </h1>
+        {player.nameKana ? (
+          <p className="mt-2 text-sm tracking-wide text-muted-foreground">{player.nameKana}</p>
+        ) : null}
+        {player.category && player.category !== "選手" || player.captain || (!player.unlisted && !player.related && player.status === "former") ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {player.category && player.category !== "選手" ? <Badge>{player.category}</Badge> : null}
+            {player.captain ? <Badge tone="solid">共同キャプテン</Badge> : null}
+            {!player.unlisted && !player.related && player.status === "former" ? (
+              <Badge>過去所属</Badge>
+            ) : null}
+          </div>
+        ) : null}
 
         {glance.length > 0 ? (
-          <dl className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-md)] bg-border sm:grid-cols-4">
+          <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-4 border-t border-border pt-5">
             {glance.map((item) => (
-              <div key={item.label} className="bg-background px-3 py-3">
-                <dt className="text-[11px] text-muted-foreground">{item.label}</dt>
+              <div key={item.label}>
+                <dt className="text-[10px] tracking-[0.16em] text-muted-foreground">{item.label}</dt>
                 <dd className="mt-1 font-display text-2xl tabular-nums leading-none">
                   {item.value}
-                  <span className="ml-1 text-xs font-sans text-muted-foreground">{item.unit}</span>
+                  <span className="ml-1 text-[11px] font-sans tracking-normal text-muted-foreground">
+                    {item.unit}
+                  </span>
                 </dd>
               </div>
             ))}
@@ -140,23 +136,26 @@ function PlayerPage() {
         ) : null}
 
         {player.profileUrl || player.xUrl || player.instagramUrl || player.noteUrl ? (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-6 flex flex-wrap gap-2">
             {player.profileUrl ? (
               <ProfileLink href={player.profileUrl} label="公式プロフィール" />
             ) : null}
             {player.xUrl ? (
               <SocialLink href={player.xUrl} label={handle ? `X @${handle}` : "X"}>
                 <XLogo />
+                <span>X</span>
               </SocialLink>
             ) : null}
             {player.instagramUrl ? (
               <SocialLink href={player.instagramUrl} label={ig ? `Instagram @${ig}` : "Instagram"}>
                 <InstagramLogo />
+                <span>Instagram</span>
               </SocialLink>
             ) : null}
             {player.noteUrl ? (
               <SocialLink href={player.noteUrl} label={note ? `note ${note}` : "note"}>
                 <NoteLogo />
+                <span>note</span>
               </SocialLink>
             ) : null}
           </div>
@@ -180,19 +179,35 @@ function PlayerPage() {
 
       {facts.length > 0 ? (
         <section>
-          <h2 className="font-display text-xl tracking-tight">プロフィール</h2>
-          <dl className="mt-4 divide-y divide-border overflow-hidden rounded-[var(--radius-lg)] bg-card shadow-[var(--shadow-border)]">
-            {facts.map((fact) => (
-              <div key={fact.label} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-3 sm:grid-cols-[9rem_1fr]">
-                <dt className="text-[11px] leading-5 text-muted-foreground">{fact.label}</dt>
-                <dd className="text-sm leading-5">{fact.value}</dd>
-              </div>
-            ))}
+          <h2 className="border-b border-border pb-2 font-display text-lg tracking-tight">プロフィール</h2>
+          <dl>
+            {facts.map((fact) => {
+              const lines = fact.label === "経歴" ? careerLines(fact.value) : [fact.value];
+              return (
+                <div
+                  key={fact.label}
+                  className="border-b border-border py-4 sm:grid sm:grid-cols-[11rem_1fr] sm:items-start sm:gap-8"
+                >
+                  <dt className="text-[11px] tracking-[0.14em] text-muted-foreground">{fact.label}</dt>
+                  <dd className="mt-1 text-sm leading-relaxed sm:mt-0">
+                    {lines.length > 1 ? (
+                      <span className="flex flex-col gap-1">
+                        {lines.map((line) => (
+                          <span key={line}>{line}</span>
+                        ))}
+                      </span>
+                    ) : (
+                      fact.value
+                    )}
+                  </dd>
+                </div>
+              );
+            })}
           </dl>
           <Link
             to="/corrections"
             search={{ slug: player.slug }}
-            className="mt-3 inline-flex h-11 items-center text-sm text-muted-foreground hover:text-foreground"
+            className="mt-4 inline-flex min-h-11 items-center text-sm text-accent hover:text-foreground"
           >
             プロフィールの修正を依頼する
           </Link>
@@ -208,8 +223,11 @@ function PlayerPage() {
       )}
 
       <section>
-        <h2 className="font-display text-xl tracking-tight">掲載記事</h2>
-        <div className="mt-4 grid gap-3">
+        <h2 className="border-b border-border pb-2 font-display text-lg tracking-tight">
+          掲載記事
+          <span className="ml-2 text-sm tabular-nums text-muted-foreground">{clips.length} 件</span>
+        </h2>
+        <div className="mt-5 grid gap-3">
           {clips.length === 0 ? (
             <p className="rounded-[var(--radius-md)] bg-muted px-4 py-8 text-center text-sm text-muted-foreground">
               まだ掲載記事がありません。シートの Clips に、この人の ID を付けて追加するとここに出ます。
@@ -223,13 +241,20 @@ function PlayerPage() {
   );
 }
 
+function careerLines(value: string): string[] {
+  return value
+    .split(/\n+|、/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
 function ProfileLink({ href, label }: { href: string; label: string }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="inline-flex h-11 items-center gap-1.5 rounded-full bg-muted px-3 text-sm text-accent hover:text-foreground"
+      className="inline-flex h-10 items-center gap-1.5 rounded-[var(--radius-sm)] border border-border px-3 text-sm text-foreground hover:border-accent hover:text-accent"
     >
       {label}
       <ExternalLink className="size-3.5" />
@@ -253,7 +278,7 @@ function SocialLink({
       rel="noreferrer"
       aria-label={label}
       title={label}
-      className="inline-flex size-11 items-center justify-center rounded-full bg-muted text-foreground hover:text-accent"
+      className="inline-flex h-10 items-center gap-2 rounded-[var(--radius-sm)] border border-border px-3 text-sm text-foreground hover:border-accent hover:text-accent"
     >
       {children}
     </a>

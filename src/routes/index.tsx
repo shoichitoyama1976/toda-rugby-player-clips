@@ -5,7 +5,6 @@ import { ArticleCard } from "@/components/article-card";
 import { JsonLd } from "@/components/json-ld";
 import { PlayerCard } from "@/components/player-card";
 import { Input } from "@/components/ui/input";
-import { lineupsNewestFirst } from "@/data/lineups";
 import { POSITIONS } from "@/data/types";
 import { searchPlayers } from "@/lib/catalog";
 import { formatDate } from "@/lib/format";
@@ -17,7 +16,8 @@ export const Route = createFileRoute("/")({ component: Home });
 const POSITION_ORDER = new Map(POSITIONS.map((item, index) => [item, index]));
 
 function Home() {
-  const { articles, players, usingSheet, configured, sheetError, countBySlug, origin } = useCatalog();
+  const { articles, players, usingSheet, configured, sheetError, countBySlug, origin, lineups } =
+    useCatalog();
   const [query, setQuery] = useState("");
   const latest = articles.slice(0, 4);
   const coveredAll = [...players]
@@ -25,7 +25,7 @@ function Home() {
     .filter((row) => row.count > 0);
   const sources = new Set(articles.map((a) => a.sourceLabel)).size;
   const siteLd = websiteJsonLd(origin);
-  const nextMatch = lineupsNewestFirst()[0];
+  const nextMatch = lineups[0];
 
   const roster = useMemo(() => {
     const current = players.filter(
@@ -83,9 +83,14 @@ function Home() {
         >
           <p className="text-[11px] tracking-[0.18em] text-accent">試合メンバーから記事へ</p>
           <p className="mt-2 font-display text-2xl leading-tight">vs {nextMatch.opponent}</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {formatDate(nextMatch.date)} {nextMatch.kickoff} K.O. · {nextMatch.venue}
-          </p>
+          <div className="mt-3 space-y-1 text-sm text-muted-foreground">
+            <p>
+              {formatDate(nextMatch.date)}
+              {nextMatch.weekday ? `（${nextMatch.weekday}）` : ""}
+            </p>
+            <p>{nextMatch.kickoff} K.O.</p>
+            <p>{nextMatch.venue}</p>
+          </div>
           <p className="mt-3 inline-flex items-center gap-1 text-sm text-foreground">
             出場メンバーを見る
             <ArrowRight className="size-3.5" />

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Bookmark, ExternalLink } from "lucide-react";
+import { MediaMark, mediaKindFromUrl } from "@/components/media-mark";
 import { Badge } from "@/components/ui/badge";
 import type { Article } from "@/data/types";
 import { formatDate, isYoutubeClip } from "@/lib/format";
@@ -73,7 +74,13 @@ export function ArticleCard({
         <div className="flex items-center gap-1">
           <time dateTime={article.date} className="text-[11px] tabular-nums text-muted-foreground">
             {formatDate(article.date)}
-            {article.sourceLabel ? ` · ${article.sourceLabel}` : ""}
+            {article.sourceLabel ? (
+              <span className="inline-flex items-center gap-1">
+                {" · "}
+                <MediaMark kind={mediaKindFromUrl(article.url)} />
+                {article.sourceLabel}
+              </span>
+            ) : null}
           </time>
           <button
             type="button"

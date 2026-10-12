@@ -62,6 +62,11 @@ export const Route = createRootRoute({
     <html lang="ja" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(localStorage.getItem("outdoor-display")==="1"){document.documentElement.setAttribute("data-outdoor","1");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content","#f4f1e8")}}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className="antialiased">
         <PreviewHostBridge />

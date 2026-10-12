@@ -1,13 +1,39 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArticleCard } from "@/components/article-card";
+import { MediaMark, dominantMediaKind } from "@/components/media-mark";
 import { Input } from "@/components/ui/input";
-import { KIND_LABEL, SOURCE_LABEL, type ArticleKind, type SourceKey } from "@/data/types";
+import { KIND_LABEL, type Article, type ArticleKind } from "@/data/types";
 import { searchArticles } from "@/lib/catalog";
 import { useCatalog } from "@/lib/use-catalog";
 import { cn } from "@/lib/utils";
 
 type Search = { media?: string };
+
+const MEDIA_GROUPS = [
+  { id: "official-hp", label: "公式HP" },
+  { id: "official-note", label: "公式note" },
+  { id: "league-one", label: "リーグワン" },
+  { id: "other", label: "その他" },
+] as const;
+
+type MediaGroup = (typeof MEDIA_GROUPS)[number]["id"];
+
+function mediaGroup(article: Article): MediaGroup {
+  const label = article.sourceLabel.trim();
+  const url = article.url;
+  if (label.includes("ヤクルトレビンズ戸田公式") || /note\.com\/yakultlevins/i.test(url)) return "official-note";
+  if (label.includes("リーグワン") || /league-one\.jp/i.test(url)) return "league-one";
+  if (
+    label === "ヤクルトレビンズ戸田" ||
+    label === "公式HP" ||
+    /(?:^|\.)yakult\.co\.jp/i.test(url) ||
+    article.source === "official"
+  ) {
+    return "official-hp";
+  }
+  return "other";
+}
 
 export const Route = createFileRoute("/articles/")({
   validateSearch: (search: Record<string, unknown>): Search => ({
@@ -20,28 +46,32 @@ function ArticlesPage() {
   const { media } = Route.useSearch();
   const { articles } = useCatalog();
   const [query, setQuery] = useState("");
-  const [source, setSource] = useState<SourceKey | "all">("all");
+  const [group, setGroup] = useState<MediaGroup | "all">("all");
   const [kind, setKind] = useState<ArticleKind | "all">("all");
 
-  const sources = useMemo(() => {
-    const keys = [...new Set(articles.map((a) => a.source))];
-    return keys;
-  }, [articles]);
+  const mediaKind = useMemo(() => {
+    if (!media) return null;
+    return dominantMediaKind(articles.filter((article) => article.sourceLabel.trim() === media).map((article) => article.url));
+  }, [articles, media]);
+
   const kinds = useMemo(() => [...new Set(articles.map((a) => a.kind))], [articles]);
 
   const filtered = useMemo(() => {
     return searchArticles(articles, query).filter((article) => {
       if (media && article.sourceLabel !== media) return false;
-      if (source !== "all" && article.source !== source) return false;
+      if (group !== "all" && mediaGroup(article) !== group) return false;
       if (kind !== "all" && article.kind !== kind) return false;
       return true;
     });
-  }, [articles, query, source, kind, media]);
+  }, [articles, query, group, kind, media]);
 
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl tracking-tight">{media ? media : "記事"}</h1>
+        <h1 className="flex items-center gap-2 font-display text-3xl tracking-tight">
+          {mediaKind ? <MediaMark kind={mediaKind} /> : null}
+          {media ? media : "記事"}
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {media ? (
             <>
@@ -64,12 +94,9 @@ function ArticlesPage() {
       {media ? null : (
         <>
           <FilterRow
-            value={source}
-            onChange={setSource}
-            options={sources.map((key) => ({
-              value: key,
-              label: SOURCE_LABEL[key] ?? key,
-            }))}
+            value={group}
+            onChange={setGroup}
+            options={MEDIA_GROUPS.map((item) => ({ value: item.id, label: item.label }))}
           />
           <FilterRow
             value={kind}
@@ -79,15 +106,37 @@ function ArticlesPage() {
         </>
       )}
       <p className="text-xs tabular-nums text-muted-foreground">{filtered.length} 件</p>
-      <div className="grid gap-3">
-        {filtered.length === 0 ? (
-          <p className="rounded-[var(--radius-md)] bg-muted px-4 py-8 text-center text-sm text-muted-foreground">
-            該当する記事がありません。
-          </p>
-        ) : (
-          filtered.map((article) => <ArticleCard key={article.id} article={article} />)
-        )}
-      </div>
+      {filtered.length === 0 ? (
+        <p className="rounded-[var(--radius-md)] bg-muted px-4 py-8 text-center text-sm text-muted-foreground">
+          該当する記事がありません。
+        </p>
+      ) : media || group !== "all" ? (
+        <div className="grid gap-3">
+          {filtered.map((article) => (
+            <ArticleCard key={article.id} article={article} />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {MEDIA_GROUPS.map((item) => {
+            const rows = filtered.filter((article) => mediaGroup(article) === item.id);
+            if (rows.length === 0) return null;
+            return (
+              <section key={item.id}>
+                <h2 className="font-display text-xl tracking-tight">
+                  {item.label}
+                  <span className="ml-2 text-sm tabular-nums text-muted-foreground">{rows.length} 件</span>
+                </h2>
+                <div className="mt-3 grid gap-3">
+                  {rows.map((article) => (
+                    <ArticleCard key={article.id} article={article} />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
