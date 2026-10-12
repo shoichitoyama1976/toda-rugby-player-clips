@@ -27,19 +27,21 @@ const MODES = [
     detail: "この画面だけ変わります。公開サイトには、まだ出ません。",
     copy: "プレビューだけ更新してください。公開サイトは変えないでください。\n\n",
   },
+  {
+    id: "publish",
+    label: "公開サイトを更新",
+    detail: "公開したURLが変わります。プレビューで確認したあと、Grokの公開が必要です。",
+    copy: "公開サイトを更新してください。プレビューではなく、公開URLに反映してください。\n\n",
+  },
 ] as const;
 
-const PUBLISH_COPY = "公開サイトを更新してください。プレビューではなく、公開URLに反映してください。\n\n";
-const PUBLISH_DETAIL =
-  "公開したURLが変わります。プレビューで確認したあと、Grokの公開が必要です。";
-
 const LAST_COMMIT = {
-  sha: "eb54be3",
-  url: "https://github.com/shoichitoyama1976/toda-rugby-player-clips/commit/eb54be3b988589b51d0dfa74ff2eaea0860d2c6a",
-  title: "選手一覧の並び、屋外表示、メニューを残す",
+  sha: "d93504c",
+  url: "https://github.com/shoichitoyama1976/toda-rugby-player-clips/commit/d93504cfa230cb8e126aa1ed12ad6d994898751e",
+  title: "プレビューのコミットから、サイト本体でないファイルを外す",
 };
 
-type ModeId = (typeof MODES)[number]["id"] | "publish";
+type ModeId = (typeof MODES)[number]["id"];
 
 function inPreview(): boolean {
   const host = window.location.hostname;
@@ -89,10 +91,7 @@ export function PreviewStatus() {
 
   if (!shown) return null;
 
-  const current =
-    mode === "publish"
-      ? { detail: PUBLISH_DETAIL }
-      : (MODES.find((item) => item.id === mode) ?? MODES[1]);
+  const current = MODES.find((item) => item.id === mode) ?? MODES[1];
   const remain = fetchedAt ? Math.max(0, fetchedAt + cacheMs - now) : 0;
   const minutes = Math.ceil(remain / 60_000);
   const next =
@@ -108,6 +107,23 @@ export function PreviewStatus() {
     setPublishNote(null);
     const item = MODES.find((entry) => entry.id === nextMode);
     if (!item) return;
+    if (nextMode === "publish") {
+      const origin = resolveCurrentEmbedderOrigin();
+      if (origin) {
+        window.parent.postMessage(
+          {
+            channel: PREVIEW_BRIDGE_CHANNEL,
+            version: PREVIEW_BRIDGE_VERSION,
+            type: "request-publish",
+            url: PUBLIC_URL,
+          },
+          origin,
+        );
+      }
+      setPublishNote(
+        "この画面からは公開サイトを書き換えられません。コピーした一文を会話に貼り、Grokの公開を押すと URL が更新されます。",
+      );
+    }
     try {
       await navigator.clipboard.writeText(item.copy);
       setCopied(true);
@@ -150,52 +166,34 @@ export function PreviewStatus() {
       setContinued(false);
     }
   }
-  async function requestPublish() {
-    setMode("publish");
-    setCopied(false);
-    const origin = resolveCurrentEmbedderOrigin();
-    if (origin) {
-      window.parent.postMessage(
-        {
-          channel: PREVIEW_BRIDGE_CHANNEL,
-          version: PREVIEW_BRIDGE_VERSION,
-          type: "request-publish",
-          url: PUBLIC_URL,
-        },
-        origin,
-      );
-    }
-    try {
-      await navigator.clipboard.writeText(PUBLISH_COPY);
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
-    setPublishNote(
-      "この画面からは公開サイトを書き換えられません。コピーした一文を会話に貼り、Grokの公開を押すと URL が更新されます。",
-    );
-  }
 
   return (
     <div className="border-b border-border bg-muted">
       <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-2 text-[11px] leading-relaxed text-muted-foreground">
-        <div className="flex flex-wrap gap-2">
-          {MODES.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              aria-pressed={mode === item.id}
-              onClick={() => void choose(item.id)}
-              className={cn(
-                "h-8 rounded-full px-3",
-                mode === item.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-background text-muted-foreground",
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
+        <div
+          className="grid grid-cols-3 overflow-hidden rounded-full border border-border bg-background"
+          role="group"
+          aria-label="この送信ですること"
+        >
+          {MODES.map((item) => {
+            const selected = mode === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => void choose(item.id)}
+                className={cn(
+                  "h-9 px-2 text-[11px] sm:text-xs",
+                  selected
+                    ? "bg-primary font-medium text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </div>
         <p>
           <span className="text-foreground">{current.detail}</span>
@@ -216,13 +214,6 @@ export function PreviewStatus() {
           ) : (
             <span>{sheetError ?? "シートはまだ接続されていません。"}</span>
           )}
-          <button
-            type="button"
-            onClick={() => void requestPublish()}
-            className="h-8 rounded-full bg-primary px-3 text-primary-foreground"
-          >
-            公開サイトを更新
-          </button>
           <button
             type="button"
             disabled={busy || !configured}

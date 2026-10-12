@@ -7,6 +7,8 @@ export type LineupSlot = {
   name: string;
   /** 先発の着番号。括弧内の数字。 */
   shirt?: number;
+  playerId?: string;
+  captain?: boolean;
 };
 
 export type Lineup = {
@@ -17,6 +19,7 @@ export type Lineup = {
   venue: string;
   label: string;
   postUrl: string;
+  weekday?: string;
   slots: LineupSlot[];
 };
 
