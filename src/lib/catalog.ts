@@ -7,6 +7,7 @@ import {
   PLAYER_SHEET_COLUMNS,
   PERSON_CATEGORIES,
   POSITIONS,
+  POSITION_UNIT,
   SOURCE_ALIASES,
   SOURCE_LABEL,
   SHEET_COLUMNS,
@@ -24,6 +25,7 @@ import {
   type SourceKey,
 } from "@/data/types";
 import { headerIndex, parseDelimited, pick, normalizeHeader } from "./csv";
+import type { Lineup, LineupSlot, LineupUnit } from "@/data/lineups";
 
 export function foldName(value: string): string {
   return value
@@ -330,17 +332,145 @@ function normId(value: string): string {
   return value.normalize("NFKC").trim();
 }
 
-export type CsvKind = "articles" | "players" | "unknown";
+export type CsvKind = "articles" | "players" | "matches" | "lineups" | "unknown";
 
 export function classifyCsv(csv: string): CsvKind {
   const rows = parseDelimited(csv);
   const headers = (rows[0] ?? []).map((h) => normalizeHeader(h));
   const has = (aliases: readonly string[]) =>
     aliases.some((alias) => headers.includes(normalizeHeader(alias)));
+  if (has(["PlayerID"]) || (has(["出場"]) && has(["着番号"]))) return "lineups";
+  if (has(["試合ID", "投稿URL"]) || has(["試合種別", "キックオフ", "着番号"])) return "matches";
   if (has(["ポジション", "身長", "ふりがな"])) return "players";
   if (has(["掲載年月日", "年月日", "掲載媒体"]) || (has(clipCol("title")) && has(clipCol("url")))) return "articles";
   if (has(col("name")) && !has(clipCol("title"))) return "players";
   return "unknown";
+}
+
+export type SheetMatch = {
+  date: string;
+  weekday: string;
+  label: string;
+  opponent: string;
+  venue: string;
+  kickoff: string;
+  postUrl: string;
+};
+
+function sheetDate(value: string): string {
+  const match = value.trim().match(/^(\d{4})[/.](\d{1,2})[/.](\d{1,2})/);
+  if (!match) return value.trim();
+  return `${match[1]}-${match[2].padStart(2, "0")}-${match[3].padStart(2, "0")}`;
+}
+
+function dateFromMatchId(id: string): string {
+  const match = id.match(/^(\d{4})(\d{2})(\d{2})/);
+  return match ? `${match[1]}-${match[2]}-${match[3]}` : "";
+}
+
+function positiveNumber(value: string): number | undefined {
+  const parsed = Number(value.replace(/[^\d.]/g, ""));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+export function matchSheet(csv: string | null | undefined): Record<string, SheetMatch> {
+  if (!csv?.trim()) return {};
+  const rows = parseDelimited(csv);
+  if (rows.length < 2) return {};
+  const index = headerIndex(rows[0]);
+  const matches: Record<string, SheetMatch> = {};
+  for (const row of rows.slice(1)) {
+    const id = pick(row, index, ["試合ID"]);
+    if (!id || matches[id]) continue;
+    const url = xPostUrl(pick(row, index, ["投稿URL"]));
+    const kind = pick(row, index, ["試合種別"]);
+    const round = pick(row, index, ["節"]);
+    matches[id] = {
+      date: sheetDate(pick(row, index, ["日付"])) || dateFromMatchId(id),
+      weekday: pick(row, index, ["曜日"]),
+      label: [kind, round].filter(Boolean).join(" ") || "試合",
+      opponent: pick(row, index, ["対戦相手"]),
+      venue: pick(row, index, ["会場"]),
+      kickoff: pick(row, index, ["キックオフ"]),
+      postUrl: url ?? "",
+    };
+  }
+  return matches;
+}
+
+export function matchPostUrls(csv: string | null | undefined): Record<string, string> {
+  const urls: Record<string, string> = {};
+  for (const [id, match] of Object.entries(matchSheet(csv))) {
+    if (match.postUrl) urls[id] = match.postUrl;
+  }
+  return urls;
+}
+
+function lineupUnit(appearance: string, group: string): LineupUnit {
+  if (/リザーブ|reserve|^r$/i.test(`${appearance}${group}`)) return "R";
+  if (/^bk$/i.test(group)) return "BK";
+  return "FW";
+}
+
+export function buildSheetLineups(
+  lineupsCsv: string | null | undefined,
+  matchesCsv: string | null | undefined,
+): Lineup[] {
+  if (!lineupsCsv?.trim()) return [];
+  const rows = parseDelimited(lineupsCsv);
+  if (rows.length < 2) return [];
+  const index = headerIndex(rows[0]);
+  const matches = matchSheet(matchesCsv);
+  const byId = new Map<string, Lineup>();
+  for (const row of rows.slice(1)) {
+    const id = pick(row, index, ["試合ID"]);
+    const name = pick(row, index, ["名前"]);
+    if (!id || !name) continue;
+    const meta = matches[id];
+    let lineup = byId.get(id);
+    if (!lineup) {
+      lineup = {
+        id,
+        date: meta?.date || dateFromMatchId(id),
+        kickoff: meta?.kickoff || "",
+        opponent: meta?.opponent || "",
+        venue: meta?.venue || "",
+        label: meta?.label || "試合",
+        postUrl: meta?.postUrl || "",
+        weekday: meta?.weekday || "",
+        slots: [],
+      };
+      byId.set(id, lineup);
+    }
+    const appearance = pick(row, index, ["出場"]);
+    const unit = lineupUnit(appearance, pick(row, index, ["ポジション区分"]));
+    const squadNumber = positiveNumber(pick(row, index, ["番号"]));
+    const shirt = positiveNumber(pick(row, index, ["着番号"]));
+    const slot: LineupSlot = {
+      unit,
+      number: unit === "R" ? (shirt ?? squadNumber ?? 0) : (squadNumber ?? shirt ?? 0),
+      name,
+      shirt: unit === "R" ? undefined : shirt,
+      playerId: pick(row, index, ["PlayerID"]) || undefined,
+      captain: Boolean(pick(row, index, ["キャプテン"])),
+    };
+    lineup.slots.push(slot);
+  }
+  return [...byId.values()].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+}
+
+function xPostUrl(value: string): string | null {
+  const raw = value.trim();
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    const host = url.hostname.replace(/^www\./, "");
+    if (host !== "x.com" && host !== "twitter.com") return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
 }
 
 export type SheetParse = {
@@ -730,6 +860,39 @@ export function searchArticles(articles: Article[], query: string): Article[] {
     );
     return hay.includes(q);
   });
+}
+
+const POSITION_ORDER = new Map(POSITIONS.map((item, index) => [item, index]));
+
+function isRosterPlayer(player: Player): boolean {
+  return !player.unlisted && !player.related && (player.category ?? "選手") === "選手";
+}
+
+function isStaffOrRelated(player: Player): boolean {
+  if (player.unlisted) return false;
+  if (player.category && player.category !== "選手") return true;
+  return Boolean(player.related);
+}
+
+export function comparePlayers(a: Player, b: Player): number {
+  const status = Number(a.status === "former") - Number(b.status === "former");
+  if (status !== 0) return status;
+  const group = rosterGroup(a) - rosterGroup(b);
+  if (group !== 0) return group;
+  const position = positionRank(a) - positionRank(b);
+  if (position !== 0) return position;
+  return a.name.localeCompare(b.name, "ja");
+}
+
+function rosterGroup(player: Player): number {
+  if (isStaffOrRelated(player)) return 2;
+  if (!isRosterPlayer(player)) return 3;
+  return POSITION_UNIT[player.position] === "BK" ? 1 : 0;
+}
+
+function positionRank(player: Player): number {
+  if (!isRosterPlayer(player)) return POSITION_ORDER.size;
+  return POSITION_ORDER.get(player.position) ?? POSITION_ORDER.size;
 }
 
 export function searchPlayers(players: Player[], query: string): Player[] {

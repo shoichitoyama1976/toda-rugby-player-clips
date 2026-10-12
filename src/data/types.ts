@@ -250,3 +250,5 @@ export const PLAYER_SHEET_TEMPLATE_CSV = [
 
 export const ARTICLE_TAB_NAMES = ["掲載記事一覧", "記事一覧", "記事", "Articles", "articles", "Clips", "clips"] as const;
 export const PLAYER_TAB_NAMES = ["選手一覧", "選手", "名簿", "Players", "players", "roster"] as const;
+export const MATCH_TAB_NAMES = ["Matches", "matches", "試合", "試合メンバー"] as const;
+export const LINEUP_TAB_NAMES = ["Lineups", "lineups", "出場", "メンバー"] as const;

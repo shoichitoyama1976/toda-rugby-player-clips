@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { ARTICLE_TAB_NAMES, PLAYER_TAB_NAMES } from "@/data/types";
+import { ARTICLE_TAB_NAMES, LINEUP_TAB_NAMES, MATCH_TAB_NAMES, PLAYER_TAB_NAMES } from "@/data/types";
 import { PUBLIC_SHEET_URL, SHEET_CACHE_MS } from "@/data/sheet-config";
 import { classifyCsv } from "./catalog";
 import { scheduleNameCheck } from "./name-check";
@@ -13,7 +13,7 @@ import {
 } from "./sheet-url";
 
 export type SheetLoadResult =
-  | { ok: true; csv: string; playersCsv: string | null; configured: true; fetchedAt: number }
+  | { ok: true; csv: string; playersCsv: string | null; matchesCsv: string | null; lineupsCsv: string | null; configured: true; fetchedAt: number }
   | { ok: false; configured: false; error: string }
   | { ok: false; configured: true; error: string; fetchedAt?: number };
 
@@ -51,7 +51,7 @@ async function fetchText(url: string, bust: boolean, csvOnly = true): Promise<st
   }
 }
 
-function pickByKind(texts: string[], kind: "articles" | "players"): string | null {
+function pickByKind(texts: string[], kind: "articles" | "players" | "matches" | "lineups"): string | null {
   const matches = texts.filter((text) => classifyCsv(text) === kind);
   if (matches.length === 0) return null;
   return matches.sort((a, b) => b.length - a.length)[0];
@@ -91,7 +91,7 @@ async function readPublicSheet(force: boolean): Promise<SheetLoadResult> {
 
   const id = spreadsheetIdFromUrl(url);
   const named = id
-    ? [...ARTICLE_TAB_NAMES, ...PLAYER_TAB_NAMES].map((name) => gvizCsvUrl(id, name))
+    ? [...ARTICLE_TAB_NAMES, ...PLAYER_TAB_NAMES, ...MATCH_TAB_NAMES, ...LINEUP_TAB_NAMES].map((name) => gvizCsvUrl(id, name))
     : [];
   const gids = id ? await discoverGids(id, url, force) : [];
   const byGid = id ? gids.map((gid) => csvExportByGid(id, gid)) : [];
@@ -102,6 +102,8 @@ async function readPublicSheet(force: boolean): Promise<SheetLoadResult> {
 
   const articlesCsv = pickByKind(texts, "articles");
   const playersCsv = pickByKind(texts, "players");
+  const matchesCsv = pickByKind(texts, "matches");
+  const lineupsCsv = pickByKind(texts, "lineups");
   const fetchedAt = Date.now();
 
   if (!articlesCsv && !playersCsv) {
@@ -120,6 +122,8 @@ async function readPublicSheet(force: boolean): Promise<SheetLoadResult> {
     ok: true,
     csv: articlesCsv ?? "",
     playersCsv,
+    matchesCsv,
+    lineupsCsv,
     configured: true,
     fetchedAt,
   };

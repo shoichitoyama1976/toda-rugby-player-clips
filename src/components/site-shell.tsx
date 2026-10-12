@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, Newspaper, Users, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { PreviewStatus } from "@/components/preview-status";
 import { useClipStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -127,6 +128,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </div>
         ) : null}
       </header>
+      <PreviewStatus />
       <main className="mx-auto w-full max-w-5xl px-4 py-8">{children}</main>
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-8 text-xs leading-relaxed text-muted-foreground">

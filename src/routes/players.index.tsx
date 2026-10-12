@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { PlayerCard } from "@/components/player-card";
 import { Input } from "@/components/ui/input";
 import { POSITIONS, POSITION_LABEL, POSITION_UNIT, type Player, type Position } from "@/data/types";
-import { searchPlayers } from "@/lib/catalog";
+import { comparePlayers, searchPlayers } from "@/lib/catalog";
 import { useCatalog } from "@/lib/use-catalog";
 import { cn } from "@/lib/utils";
 
@@ -17,23 +17,6 @@ function isStaffOrRelated(player: Player): boolean {
   if (player.unlisted) return false;
   if (player.category && player.category !== "選手") return true;
   return Boolean(player.related);
-}
-
-const POSITION_ORDER = new Map(POSITIONS.map((item, index) => [item, index]));
-
-function groupRank(player: Player): number {
-  if (isStaffOrRelated(player)) return 2;
-  if (!isRosterPlayer(player)) return 3;
-  return POSITION_UNIT[player.position] === "BK" ? 1 : 0;
-}
-
-function statusRank(player: Player): number {
-  return player.status === "former" ? 1 : 0;
-}
-
-function positionRank(player: Player): number {
-  if (!isRosterPlayer(player)) return POSITION_ORDER.size;
-  return POSITION_ORDER.get(player.position) ?? POSITION_ORDER.size;
 }
 
 function PlayersPage() {
@@ -62,15 +45,7 @@ function PlayersPage() {
         position === "all" ? true : !player.related && !player.unlisted && player.position === position,
       )
       .filter((player) => (joined === "all" ? true : player.joined === joined))
-      .sort((a, b) => {
-        const byStatus = statusRank(a) - statusRank(b);
-        if (byStatus !== 0) return byStatus;
-        const byGroup = groupRank(a) - groupRank(b);
-        if (byGroup !== 0) return byGroup;
-        const byPosition = positionRank(a) - positionRank(b);
-        if (byPosition !== 0) return byPosition;
-        return a.name.localeCompare(b.name, "ja");
-      });
+      .sort(comparePlayers);
   }, [players, query, unit, position, joined]);
 
   const positions =

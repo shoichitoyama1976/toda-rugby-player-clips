@@ -5,43 +5,24 @@ import { ArticleCard } from "@/components/article-card";
 import { JsonLd } from "@/components/json-ld";
 import { PlayerCard } from "@/components/player-card";
 import { Input } from "@/components/ui/input";
-import { POSITIONS } from "@/data/types";
-import { searchPlayers } from "@/lib/catalog";
+import { comparePlayers, searchPlayers } from "@/lib/catalog";
 import { formatDate } from "@/lib/format";
 import { websiteJsonLd } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
 
 export const Route = createFileRoute("/")({ component: Home });
 
-const POSITION_ORDER = new Map(POSITIONS.map((item, index) => [item, index]));
-
 function Home() {
   const { articles, players, usingSheet, configured, sheetError, countBySlug, origin, lineups } =
     useCatalog();
   const [query, setQuery] = useState("");
   const latest = articles.slice(0, 4);
-  const coveredAll = [...players]
-    .map((player) => ({ player, count: countBySlug.get(player.slug) ?? 0 }))
-    .filter((row) => row.count > 0);
   const sources = new Set(articles.map((a) => a.sourceLabel)).size;
   const siteLd = websiteJsonLd(origin);
   const nextMatch = lineups[0];
 
   const roster = useMemo(() => {
-    const current = players.filter(
-      (player) =>
-        !player.unlisted &&
-        !player.related &&
-        player.status === "current" &&
-        (!player.category || player.category === "選手"),
-    );
-    const list = query.trim() ? searchPlayers(players, query) : current;
-    return [...list].sort((a, b) => {
-      const byPos =
-        (POSITION_ORDER.get(a.position) ?? 99) - (POSITION_ORDER.get(b.position) ?? 99);
-      if (byPos !== 0 && !query.trim()) return byPos;
-      return a.name.localeCompare(b.name, "ja");
-    });
+    return [...searchPlayers(players, query)].sort(comparePlayers);
   }, [players, query]);
 
   return (
@@ -99,7 +80,7 @@ function Home() {
       ) : null}
 
       <section className="grid grid-cols-3 gap-3">
-        <Stat label="選手" value={coveredAll.length} to="/players" />
+        <Stat label="選手" value={players.length} to="/players" />
         <Stat label="記事" value={articles.length} to="/articles" />
         <Stat label="媒体" value={sources} to="/sources" />
       </section>
@@ -114,9 +95,7 @@ function Home() {
             aria-label="選手を検索"
           />
         </div>
-        <p className="mt-3 text-xs tabular-nums text-muted-foreground">
-          {query.trim() ? `${roster.length} 人` : "いまの名簿（ポジション順）"}
-        </p>
+        <p className="mt-3 text-xs tabular-nums text-muted-foreground">{roster.length} 人</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {roster.map((player) => (
             <PlayerCard key={player.slug} player={player} count={countBySlug.get(player.slug) ?? 0} />

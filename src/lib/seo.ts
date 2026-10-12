@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { POSITION_LABEL, type Article, type Player } from "@/data/types";
-import { articlesForPlayer, resolveCatalog } from "@/lib/catalog";
+import { articlesForPlayer, buildSheetLineups, resolveCatalog } from "@/lib/catalog";
+import { LINEUPS, type Lineup } from "@/data/lineups";
 
 export const SITE_NAME = "戸田ラグビー選手記事帖";
 
@@ -18,22 +19,32 @@ export function playerSeo(player: Player, count: number): { title: string; descr
   return { title, description };
 }
 
-export function catalogFromSheetData(data: unknown): { articles: Article[]; players: Player[] } {
-  const sheet = (data as { sheet?: { ok?: boolean; csv?: string; playersCsv?: string | null } } | undefined)
-    ?.sheet;
-  if (sheet?.ok) return resolveCatalog(sheet.csv ?? null, sheet.playersCsv ?? null);
-  return resolveCatalog(null, null);
+export function catalogFromSheetData(data: unknown): {
+  articles: Article[];
+  players: Player[];
+  lineups: Lineup[];
+} {
+  const sheet = (
+    data as {
+      sheet?: { ok?: boolean; csv?: string; playersCsv?: string | null; matchesCsv?: string | null; lineupsCsv?: string | null };
+    } | undefined
+  )?.sheet;
+  const catalog = sheet?.ok
+    ? resolveCatalog(sheet.csv ?? null, sheet.playersCsv ?? null)
+    : resolveCatalog(null, null);
+  const lineups = sheet?.ok ? buildSheetLineups(sheet.lineupsCsv, sheet.matchesCsv) : [];
+  return { ...catalog, lineups: lineups.length > 0 ? lineups : LINEUPS };
 }
 
 export function catalogFromHeadMatches(
   matches: Array<{ loaderData?: unknown }>,
-): { articles: Article[]; players: Player[] } {
+): { articles: Article[]; players: Player[]; lineups: Lineup[] } {
   for (const match of matches) {
     if (match.loaderData && typeof match.loaderData === "object" && "sheet" in match.loaderData) {
       return catalogFromSheetData(match.loaderData);
     }
   }
-  return resolveCatalog(null, null);
+  return catalogFromSheetData(undefined);
 }
 
 export function clipCount(articles: Article[], player: Player): number {
