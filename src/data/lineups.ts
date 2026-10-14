@@ -9,6 +9,8 @@ export type LineupSlot = {
   shirt?: number;
   playerId?: string;
   captain?: boolean;
+  /** Lineups シートのポジション。PR、SO など。 */
+  position?: string;
 };
 
 export type Lineup = {

@@ -11,11 +11,11 @@ export function displayPersonName(name: string): string {
 
 export function playerSeo(player: Player, count: number): { title: string; description: string } {
   const name = displayPersonName(player.name);
-  const title = `${name}の掲載記事｜${SITE_NAME}`;
+  const title = `${name}の掲載記事｜レビンズ戸田`;
   const description =
     count > 0
-      ? `${name}が出てきたオンライン記事 ${count} 件。${SITE_NAME}（非公式）。本文は転載せず、原文へ案内します。`
-      : `${name}の掲載記事一覧。${SITE_NAME}（非公式）。本文は転載しません。`;
+      ? `${name}が出てきたオンライン記事 ${count} 件。ヤクルトレビンズ戸田の非公式な一覧です。本文は転載せず、原文へ案内します。`
+      : `${name}の掲載記事一覧。ヤクルトレビンズ戸田の非公式な一覧です。本文は転載しません。`;
   return { title, description };
 }
 
@@ -107,7 +107,7 @@ export function websiteJsonLd(origin: string) {
     url: origin,
     inLanguage: "ja",
     description:
-      "レビンズの選手が出てきたオンライン記事を、選手や媒体ごとにたどる非公式の索引です。本文は転載しません。",
+      "ヤクルトレビンズ戸田の選手が出てきたオンライン記事を、選手や媒体ごとにたどる非公式の索引です。本文は転載しません。",
     publisher: {
       "@type": "Person",
       name: "個人運営（非公式）",
@@ -125,7 +125,7 @@ export function playerJsonLd(origin: string, player: Player, clips: Article[]) {
     "@id": `${page}#person`,
     name,
     url: page,
-    description: `${name}の掲載記事をたどる非公式の索引。${SITE_NAME}。公式プロフィールではありません。`,
+    description: `${name}の掲載記事をたどる、ヤクルトレビンズ戸田の非公式な索引。${SITE_NAME}。公式プロフィールではありません。`,
   };
   if (player.nameKana) person.alternateName = player.nameKana;
   if (jobTitle) person.jobTitle = jobTitle;

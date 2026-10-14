@@ -36,9 +36,9 @@ const MODES = [
 ] as const;
 
 const LAST_COMMIT = {
-  sha: "d93504c",
-  url: "https://github.com/shoichitoyama1976/toda-rugby-player-clips/commit/d93504cfa230cb8e126aa1ed12ad6d994898751e",
-  title: "プレビューのコミットから、サイト本体でないファイルを外す",
+  sha: "489dc9c",
+  url: "https://github.com/shoichitoyama1976/toda-rugby-player-clips/commit/489dc9ce06a5eef9eb6f818ce5189fc208c2da48",
+  title: "READMEを現在の仕様に合わせる",
 };
 
 type ModeId = (typeof MODES)[number]["id"];

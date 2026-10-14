@@ -9,6 +9,14 @@ export function formatDate(value: string): string {
   return value;
 }
 
+export function formatMonthDay(value: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const parsed = parseISO(value);
+    if (isValid(parsed)) return format(parsed, "M月d日", { locale: ja });
+  }
+  return value;
+}
+
 export function formatTokyoDate(value: string): string {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return "";

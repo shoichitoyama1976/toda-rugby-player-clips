@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Bookmark, ExternalLink } from "lucide-react";
 import { MediaMark, mediaKindFromUrl } from "@/components/media-mark";
 import { Badge } from "@/components/ui/badge";
+import { isBrokenArticleUrl } from "@/data/broken-links";
 import type { Article } from "@/data/types";
 import { formatDate, isYoutubeClip } from "@/lib/format";
 import { trackReadOriginal } from "@/lib/analytics";
@@ -19,6 +20,7 @@ export function ArticleCard({
   const toggle = useClipStore((s) => s.toggleBookmark);
   const hasLink = /^https?:\/\//i.test(article.url);
   const youtube = isYoutubeClip(article.url, article.sourceLabel);
+  const broken = isBrokenArticleUrl(article.url);
 
   return (
     <article
@@ -50,9 +52,10 @@ export function ArticleCard({
         </Link>
       </h3>
 
-      {youtube ? (
-        <p className="mt-2">
-          <Badge>YouTube 音あり注意</Badge>
+      {youtube || broken ? (
+        <p className="mt-2 flex flex-wrap gap-2">
+          {youtube ? <Badge>YouTube 音あり注意</Badge> : null}
+          {broken ? <Badge>リンク切れ</Badge> : null}
         </p>
       ) : null}
 

@@ -11,6 +11,7 @@ const NAV = [
   { to: "/matches", label: "試合" },
   { to: "/players", label: "選手" },
   { to: "/articles", label: "記事" },
+  { to: "/links", label: "リンク" },
   { to: "/saved", label: "保存した記事" },
   { to: "/about", label: "このサイトについて" },
   { to: "/corrections", label: "修正依頼" },

@@ -13,6 +13,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           `${origin}/`,
           `${origin}/players`,
           `${origin}/matches`,
+          `${origin}/links`,
           ...lineups.map((lineup) => `${origin}/matches/${lineup.id}`),
           ...players.filter((player) => !player.unlisted).map((player) => `${origin}/players/${player.slug}`),
         ];

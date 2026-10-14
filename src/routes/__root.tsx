@@ -32,7 +32,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "戸田のラグビー選手が登場した記事を、選手や媒体ごとにたどる非公式の一覧です。本文は転載しません。",
+          "ヤクルトレビンズ戸田の選手が登場した記事を、選手や媒体ごとにたどる非公式の一覧です。本文は転載しません。",
       },
       { name: "theme-color", content: "#0c1018" },
     ],

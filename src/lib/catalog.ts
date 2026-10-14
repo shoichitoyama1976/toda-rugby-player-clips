@@ -453,6 +453,7 @@ export function buildSheetLineups(
       shirt: unit === "R" ? undefined : shirt,
       playerId: pick(row, index, ["PlayerID"]) || undefined,
       captain: Boolean(pick(row, index, ["キャプテン"])),
+      position: pick(row, index, ["ポジション"]) || undefined,
     };
     lineup.slots.push(slot);
   }

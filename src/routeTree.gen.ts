@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CorrectionsRouteImport } from './routes/corrections'
 import { Route as InboxRouteImport } from './routes/inbox'
+import { Route as LinksRouteImport } from './routes/links'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -43,6 +44,11 @@ const CorrectionsRoute = CorrectionsRouteImport.update({
 const InboxRoute = InboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LinksRoute = LinksRouteImport.update({
+  id: '/links',
+  path: '/links',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/corrections': typeof CorrectionsRoute
   '/inbox': typeof InboxRoute
+  '/links': typeof LinksRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/corrections': typeof CorrectionsRoute
   '/inbox': typeof InboxRoute
+  '/links': typeof LinksRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/corrections': typeof CorrectionsRoute
   '/inbox': typeof InboxRoute
+  '/links': typeof LinksRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/corrections'
     | '/inbox'
+    | '/links'
     | '/robots.txt'
     | '/saved'
     | '/sitemap.xml'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/corrections'
     | '/inbox'
+    | '/links'
     | '/robots.txt'
     | '/saved'
     | '/sitemap.xml'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/corrections'
     | '/inbox'
+    | '/links'
     | '/robots.txt'
     | '/saved'
     | '/sitemap.xml'
@@ -212,6 +224,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   CorrectionsRoute: typeof CorrectionsRoute
   InboxRoute: typeof InboxRoute
+  LinksRoute: typeof LinksRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SavedRoute: typeof SavedRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -253,6 +266,13 @@ declare module '@tanstack/react-router' {
       path: '/inbox'
       fullPath: '/inbox'
       preLoaderRoute: typeof InboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/links': {
+      id: '/links'
+      path: '/links'
+      fullPath: '/links'
+      preLoaderRoute: typeof LinksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -340,6 +360,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   CorrectionsRoute: CorrectionsRoute,
   InboxRoute: InboxRoute,
+  LinksRoute: LinksRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SavedRoute: SavedRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

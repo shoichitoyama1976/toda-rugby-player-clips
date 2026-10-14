@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LineupSlot, LineupUnit } from "@/data/lineups";
 import { matchPlayerSlug } from "@/lib/catalog";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatMonthDay } from "@/lib/format";
 import { catalogFromHeadMatches, SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
 import { cn } from "@/lib/utils";
@@ -12,9 +12,19 @@ export const Route = createFileRoute("/matches/$id")({
     const { lineups } = catalogFromHeadMatches(matches);
     const lineup = lineups.find((item) => item.id === params.id);
     const title = lineup
-      ? `${formatDate(lineup.date)} vs ${lineup.opponent}｜${SITE_NAME}`
+      ? `${formatMonthDay(lineup.date)} ヤクルトレビンズ戸田 vs ${lineup.opponent}`
       : `試合が見つかりません｜${SITE_NAME}`;
-    return { meta: [{ title }] };
+    return {
+      meta: [
+        { title },
+        {
+          name: "description",
+          content: lineup
+            ? `ヤクルトレビンズ戸田の出場メンバーです。名前をタップすると、掲載記事へ進みます。`
+            : "試合が見つかりません。",
+        },
+      ],
+    };
   },
 });
 
@@ -48,7 +58,7 @@ function MatchPage() {
       <header className="max-w-2xl">
         <p className="text-[11px] tracking-[0.18em] text-accent">{lineup.label}</p>
         <h1 className="mt-2 font-display text-3xl leading-tight tracking-tight sm:text-4xl">
-          vs {lineup.opponent}
+          ヤクルトレビンズ戸田 vs {lineup.opponent}
         </h1>
         <div className="mt-3 space-y-1 text-sm text-muted-foreground">
           <p>
@@ -112,6 +122,7 @@ function SlotRow({
     (slug ? players.find((item) => item.slug === slug) : undefined);
   const count = player ? (countBySlug.get(player.slug) ?? 0) : 0;
   const reading = nameAside(slot.name, player?.name, player?.nameKana);
+  const position = slot.position?.trim() || player?.position || "";
   const className = cn(
     "flex min-h-14 items-center gap-3 rounded-[var(--radius-lg)] bg-card px-3 py-2 shadow-[var(--shadow-border)]",
     player && "transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]",
@@ -120,6 +131,9 @@ function SlotRow({
     <>
       <span className="w-8 shrink-0 text-center font-display text-lg tabular-nums text-accent">
         {slot.number}
+      </span>
+      <span className="w-10 shrink-0 text-center text-xs tracking-wide text-muted-foreground">
+        {position}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-base leading-snug">

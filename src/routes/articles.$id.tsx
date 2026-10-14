@@ -3,6 +3,7 @@ import { Bookmark, ExternalLink } from "lucide-react";
 import { ArticleCard } from "@/components/article-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { isBrokenArticleUrl } from "@/data/broken-links";
 import { KIND_LABEL, POSITION_LABEL } from "@/data/types";
 import { formatDate, isYoutubeClip } from "@/lib/format";
 import { trackReadOriginal } from "@/lib/analytics";
@@ -65,6 +66,7 @@ function ArticlePage() {
           </time>
           <Badge>{article.sourceLabel}</Badge>
           {youtube ? <Badge>YouTube 音あり注意</Badge> : null}
+          {isBrokenArticleUrl(article.url) ? <Badge>リンク切れ</Badge> : null}
           <Badge tone="accent">{KIND_LABEL[article.kind]}</Badge>
           {article.season ? <Badge>{article.season}</Badge> : null}
         </div>

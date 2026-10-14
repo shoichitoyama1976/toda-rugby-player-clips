@@ -10,7 +10,19 @@ import { formatDate } from "@/lib/format";
 import { websiteJsonLd } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "戸田ラグビー選手記事帖｜ヤクルトレビンズ戸田の選手記事" },
+      {
+        name: "description",
+        content:
+          "ヤクルトレビンズ戸田の選手が出てきたオンライン記事を、選手や媒体ごとにたどる非公式の一覧です。本文は転載しません。",
+      },
+    ],
+  }),
+  component: Home,
+});
 
 function Home() {
   const { articles, players, usingSheet, configured, sheetError, countBySlug, origin, lineups } =
@@ -34,7 +46,20 @@ function Home() {
           選手から、記事をたどる
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          試合の行き帰りに、今日出る選手の名前を入れて開いてください。掲載記事へ案内します。本文は転載しません。
+          レビンズの試合の行き帰りに、今日出る選手の名前を入れて開いてください。掲載記事へ案内します。本文は転載していません。
+          {nextMatch ? (
+            <>
+              直近の試合の出場選手から探したい場合は、すぐ下の
+              <Link
+                to="/matches/$id"
+                params={{ id: nextMatch.id }}
+                className="mx-1 text-accent hover:text-foreground"
+              >
+                【出場メンバーを見る】
+              </Link>
+              からもたどれます。
+            </>
+          ) : null}
           <Link to="/about" hash="purpose" className="ml-1 text-accent hover:text-foreground">
             なぜ集めているか
           </Link>
