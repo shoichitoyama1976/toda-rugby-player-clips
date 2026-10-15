@@ -1,6 +1,7 @@
 import { SEED_ARTICLES } from "@/data/articles";
 import { OFFICIAL_PROFILES } from "@/data/official-profiles";
 import { PLAYERS, PLAYER_BY_SLUG } from "@/data/players";
+import { legacyLatinSlug, personSlug } from "@/lib/player-slug";
 import {
   KIND_ALIASES,
   KIND_LABEL,
@@ -754,8 +755,44 @@ function playerFromRow(row: SheetPlayerRow): Player {
   };
 }
 
+function withPersonSlug(player: Player): Player {
+  const next = personSlug(player.name, player.nameKana);
+  if (!next || next === player.slug) return player;
+  const legacy = new Set(player.legacySlugs ?? []);
+  if (player.slug) legacy.add(player.slug);
+  if (player.sheetId) {
+    const numbered = `p-${normId(player.sheetId)}`;
+    if (numbered !== next) legacy.add(numbered);
+  }
+  const reversed = legacyLatinSlug(player.name);
+  if (reversed && reversed !== next) legacy.add(reversed);
+  legacy.delete(next);
+  return { ...player, slug: next, legacySlugs: [...legacy] };
+}
+
+function uniquePersonSlugs(players: Player[]): Player[] {
+  const seen = new Set<string>();
+  return players.map((player) => {
+    if (!seen.has(player.slug)) {
+      seen.add(player.slug);
+      return player;
+    }
+    const suffix = player.sheetId ? normId(player.sheetId) : "2";
+    const slug = `${player.slug}-${suffix}`;
+    seen.add(slug);
+    return { ...player, slug };
+  });
+}
+
+export function findPlayer(players: Player[], slug: string): Player | undefined {
+  return (
+    players.find((player) => player.slug === slug) ??
+    players.find((player) => player.legacySlugs?.includes(slug))
+  );
+}
+
 export function mergeSheetPlayers(seed: Player[], rows: SheetPlayerRow[]): Player[] {
-  if (rows.length === 0) return seed;
+  if (rows.length === 0) return uniquePersonSlugs(seed.map(withPersonSlug));
   const merged = seed.map((player) => ({ ...player }));
   const unused = [...rows];
 
@@ -775,7 +812,7 @@ export function mergeSheetPlayers(seed: Player[], rows: SheetPlayerRow[]): Playe
   for (const row of unused) {
     merged.push(playerFromRow(row));
   }
-  return merged;
+  return uniquePersonSlugs(merged.map(withPersonSlug));
 }
 
 export function extraPlayersFromArticles(articles: Article[], roster: Player[]): Player[] {

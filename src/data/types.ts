@@ -81,6 +81,8 @@ export type Player = {
   extras?: PlayerFact[];
   fromSheet?: boolean;
   sheetId?: string;
+  /** 以前の選手ページ。苗字だけのアドレスや p-番号から移す。 */
+  legacySlugs?: string[];
 };
 
 export const ARTICLE_KINDS = [

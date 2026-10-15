@@ -9,6 +9,7 @@ import {
   resolveCurrentEmbedderOrigin,
 } from "@/lib/preview-host-bridge";
 import { commitPreview } from "@/lib/save-snapshot";
+import { listOpenIssues, type OpenIssue } from "@/lib/open-issues";
 import { useCatalog } from "@/lib/use-catalog";
 import { cn } from "@/lib/utils";
 
@@ -82,10 +83,19 @@ export function PreviewStatus() {
   const [saveNote, setSaveNote] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [commit, setCommit] = useState(LAST_COMMIT);
+  const [issues, setIssues] = useState<OpenIssue[] | null>(null);
+  const [issueNote, setIssueNote] = useState<string | null>(null);
 
   useEffect(() => {
-    setShown(inPreview());
+    const preview = inPreview();
+    setShown(preview);
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
+    if (preview) {
+      void listOpenIssues().then((result) => {
+        if (result.ok) setIssues(result.issues);
+        else setIssueNote(result.error);
+      });
+    }
     return () => window.clearInterval(timer);
   }, []);
 
@@ -159,7 +169,7 @@ export function PreviewStatus() {
     setContinued(false);
     try {
       await navigator.clipboard.writeText(
-        `試合メンバーの定期実行を、同じ内容で7日続けてください。予約IDは ${LINEUP_SCHEDULE.id} です。\n\n`,
+        `試合メンバーの定期実行を、同じ内容で7日続けてください。予約IDは ${LINEUP_SCHEDULE.id} です。\nMatchesの日付は yyyy/MM/dd、キックオフは hh:mm:ss で入れてください。\n\n`,
       );
       setContinued(true);
     } catch {
@@ -267,6 +277,23 @@ export function PreviewStatus() {
         {continued ? (
           <p className="text-foreground">続ける一文をコピーしました。会話の先頭に貼ってください。</p>
         ) : null}
+        <div>
+          <p className="text-foreground">オープン Issue</p>
+          {issueNote ? <p>{issueNote}</p> : null}
+          {issues && issues.length === 0 ? <p>開いている Issue はありません。</p> : null}
+          {issues && issues.length > 0 ? (
+            <ul className="mt-1 space-y-1">
+              {issues.map((issue) => (
+                <li key={issue.number}>
+                  <a href={issue.url} className="text-accent hover:text-foreground">
+                    #{issue.number} {issue.title}
+                  </a>
+                  <span> · {issue.assignee}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span>
             最後に残した{" "}

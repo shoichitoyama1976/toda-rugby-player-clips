@@ -1,11 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
 import { ArticleCard } from "@/components/article-card";
 import { JsonLd } from "@/components/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { POSITION_LABEL, POSITION_UNIT } from "@/data/types";
-import { articlesForPlayer, instagramHandle, noteHandle, playerCareer, xHandle } from "@/lib/catalog";
+import { articlesForPlayer, findPlayer, instagramHandle, noteHandle, playerCareer, xHandle } from "@/lib/catalog";
 import { ageFromBirthday, formatDate, formatTokyoDate, yearsOnRoster } from "@/lib/format";
 import { catalogFromHeadMatches, clipCount, playerJsonLd, playerSeo, SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/players/$slug")({
   component: PlayerPage,
   head: ({ params, matches }) => {
     const { articles, players } = catalogFromHeadMatches(matches);
-    const player = players.find((item) => item.slug === params.slug);
+    const player = findPlayer(players, params.slug);
     if (!player) {
       return {
         meta: [{ title: `選手が見つかりません｜${SITE_NAME}` }],
@@ -35,7 +35,10 @@ export const Route = createFileRoute("/players/$slug")({
 function PlayerPage() {
   const { slug } = Route.useParams();
   const { articles, players, origin, notices } = useCatalog();
-  const player = players.find((item) => item.slug === slug);
+  const player = findPlayer(players, slug);
+  if (player && player.slug !== slug) {
+    return <Navigate to="/players/$slug" params={{ slug: player.slug }} replace />;
+  }
 
   if (!player) {
     return (
