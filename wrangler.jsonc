@@ -1,8 +1,8 @@
 {
   "name": "toda-rugby-player-clips",
+  "main": ".vercel/output/functions/__server.func/index.mjs",
   "compatibility_date": "2026-10-15",
   "assets": {
-    "directory": "./.vercel/output/static",
-    "not_found_handling": "single-page-application"
+    "directory": ".vercel/output/static"
   }
 }
