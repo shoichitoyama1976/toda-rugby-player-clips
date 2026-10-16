@@ -150,7 +150,7 @@ function PlayersPage() {
             );
           })}
         </div>
-      )}
+      ) : null}
       {unit === "other" || position !== null ? (
         <select
           value={joinedValue}
