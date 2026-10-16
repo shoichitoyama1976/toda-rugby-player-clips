@@ -169,7 +169,7 @@ export function PreviewStatus() {
     setContinued(false);
     try {
       await navigator.clipboard.writeText(
-        `試合メンバーの定期実行を、同じ内容で7日続けてください。予約IDは ${LINEUP_SCHEDULE.id} です。\nMatchesの日付は yyyy/MM/dd、キックオフは hh:mm:ss で入れてください。\n\n`,
+        `試合メンバーの定期実行を、同じ内容で7日続けてください。予約IDは ${LINEUP_SCHEDULE.id} です。\n取得結果はスプレッドシートではなく、GitHubの src/data/matches.csv と src/data/lineups.csv に足してください。日付は yyyy/MM/dd、キックオフは hh:mm:ss です。\n\n`,
       );
       setContinued(true);
     } catch {
