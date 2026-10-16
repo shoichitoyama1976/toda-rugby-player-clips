@@ -71,17 +71,12 @@ function MatchPage() {
           名前をタップすると、その選手の記事一覧へ進みます。下の参照元が、このメンバーの元の投稿です。
         </p>
         <p className="mt-4 text-[11px] tracking-[0.18em] text-muted-foreground">参照元</p>
-        <a
-          href={sourceUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-1 inline-flex min-h-11 items-center gap-2 text-sm text-accent hover:text-foreground"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="size-[18px] fill-current">
-            <path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z" />
-          </svg>
-          レビンズの公式Xの投稿を開く
-        </a>
+        <div className="mt-1 flex flex-col items-start">
+          <XLink href={sourceUrl} label="レビンズの公式Xの投稿を開く" />
+          {lineup.opponentUrl ? (
+            <XLink href={lineup.opponentUrl} label={`${lineup.opponent}の公式Xを開く`} />
+          ) : null}
+        </div>
       </header>
 
       {UNITS.map((unit) => {
@@ -104,6 +99,22 @@ function MatchPage() {
         );
       })}
     </div>
+  );
+}
+
+function XLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex min-h-11 items-center gap-2 text-sm text-accent hover:text-foreground"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="size-[18px] fill-current">
+        <path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z" />
+      </svg>
+      {label}
+    </a>
   );
 }
 

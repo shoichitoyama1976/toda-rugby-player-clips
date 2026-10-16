@@ -356,6 +356,7 @@ export type SheetMatch = {
   venue: string;
   kickoff: string;
   postUrl: string;
+  opponentUrl: string;
 };
 
 function sheetDate(value: string): string {
@@ -384,6 +385,7 @@ export function matchSheet(csv: string | null | undefined): Record<string, Sheet
     const id = pick(row, index, ["試合ID"]);
     if (!id || matches[id]) continue;
     const url = xPostUrl(pick(row, index, ["投稿URL"]));
+    const opponentUrl = xPostUrl(pick(row, index, ["対戦相手X"]));
     const kind = pick(row, index, ["試合種別"]);
     const round = pick(row, index, ["節"]);
     matches[id] = {
@@ -394,6 +396,7 @@ export function matchSheet(csv: string | null | undefined): Record<string, Sheet
       venue: pick(row, index, ["会場"]),
       kickoff: pick(row, index, ["キックオフ"]),
       postUrl: url ?? "",
+      opponentUrl: opponentUrl ?? "",
     };
   }
   return matches;
@@ -438,6 +441,7 @@ export function buildSheetLineups(
         venue: meta?.venue || "",
         label: meta?.label || "試合",
         postUrl: meta?.postUrl || "",
+        opponentUrl: meta?.opponentUrl || "",
         weekday: meta?.weekday || "",
         slots: [],
       };

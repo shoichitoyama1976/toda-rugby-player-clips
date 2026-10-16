@@ -21,6 +21,7 @@ export type Lineup = {
   venue: string;
   label: string;
   postUrl: string;
+  opponentUrl?: string;
   weekday?: string;
   slots: LineupSlot[];
 };
