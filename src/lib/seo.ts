@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { POSITION_LABEL, type Article, type Player } from "@/data/types";
 import { articlesForPlayer, buildSheetLineups, resolveCatalog } from "@/lib/catalog";
 import { LINEUPS, type Lineup } from "@/data/lineups";
-import { LINEUPS_CSV, MATCHES_CSV } from "@/data/match-archive";
+import { LINEUPS_CSV, MATCHES_CSV } from "@/data/sheet-archive";
 
 export const SITE_NAME = "戸田ラグビー選手記事帖";
 

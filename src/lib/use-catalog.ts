@@ -1,7 +1,7 @@
 import { useLoaderData } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { LINEUPS } from "@/data/lineups";
-import { LINEUPS_CSV, MATCHES_CSV } from "@/data/match-archive";
+import { LINEUPS_CSV, MATCHES_CSV } from "@/data/sheet-archive";
 import { SHEET_CACHE_MS } from "@/data/sheet-config";
 import { articlesForPlayer, buildSheetLineups, matchSheet, resolveCatalog } from "./catalog";
 
