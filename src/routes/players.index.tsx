@@ -26,27 +26,47 @@ function PlayersPage() {
   const [position, setPosition] = useState<Position | "all">("all");
   const [joined, setJoined] = useState<"all" | string>("all");
 
+  const base = useMemo(() => {
+    return searchPlayers(players, query).filter((player) => {
+      if (unit === "all") return true;
+      if (unit === "other") return isStaffOrRelated(player);
+      return isRosterPlayer(player) && POSITION_UNIT[player.position] === unit;
+    });
+  }, [players, query, unit]);
+
   const years = useMemo(() => {
+    const pool =
+      position === "all"
+        ? base
+        : base.filter((player) => !player.related && !player.unlisted && player.position === position);
     const set = new Set<string>();
-    for (const player of players) {
+    for (const player of pool) {
       if (player.joined) set.add(player.joined);
     }
     return [...set].sort((a, b) => Number(b) - Number(a));
-  }, [players]);
+  }, [base, position]);
+
+  const joinedValue = joined !== "all" && years.includes(joined) ? joined : "all";
+  const yearCleared = joined !== "all" && joinedValue === "all";
 
   const filtered = useMemo(() => {
-    return searchPlayers(players, query)
-      .filter((player) => {
-        if (unit === "all") return true;
-        if (unit === "other") return isStaffOrRelated(player);
-        return isRosterPlayer(player) && POSITION_UNIT[player.position] === unit;
-      })
+    return base
       .filter((player) =>
         position === "all" ? true : !player.related && !player.unlisted && player.position === position,
       )
-      .filter((player) => (joined === "all" ? true : player.joined === joined))
+      .filter((player) => (joinedValue === "all" ? true : player.joined === joinedValue))
       .sort(comparePlayers);
-  }, [players, query, unit, position, joined]);
+  }, [base, position, joinedValue]);
+
+  const positionCount = useMemo(() => {
+    const counts = new Map<Position, number>();
+    for (const player of base) {
+      if (player.related || player.unlisted) continue;
+      if (joinedValue !== "all" && player.joined !== joinedValue) continue;
+      counts.set(player.position, (counts.get(player.position) ?? 0) + 1);
+    }
+    return counts;
+  }, [base, joinedValue]);
 
   const positions =
     unit === "FW" || unit === "BK" ? POSITIONS.filter((p) => POSITION_UNIT[p] === unit) : POSITIONS;
@@ -101,25 +121,33 @@ function PlayersPage() {
           >
             すべてのポジション
           </button>
-          {positions.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setPosition(item)}
-              className={cn(
-                "flex min-h-16 flex-col items-center justify-center rounded-[var(--radius-lg)] px-2",
-                position === item ? "bg-primary text-primary-foreground" : "bg-card text-foreground shadow-[var(--shadow-border)]",
-              )}
-            >
-              <span className="font-display text-lg leading-none">{item}</span>
-              <span className="mt-1 text-sm">{POSITION_LABEL[item]}</span>
-            </button>
-          ))}
+          {positions.map((item) => {
+            const count = positionCount.get(item) ?? 0;
+            const selected = position === item;
+            return (
+              <button
+                key={item}
+                type="button"
+                disabled={count === 0}
+                onClick={() => setPosition(item)}
+                className={cn(
+                  "flex min-h-16 flex-col items-center justify-center rounded-[var(--radius-lg)] px-2",
+                  selected
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-foreground shadow-[var(--shadow-border)]",
+                  count === 0 && "opacity-40",
+                )}
+              >
+                <span className="font-display text-lg leading-none">{item}</span>
+                <span className="mt-1 text-sm">{POSITION_LABEL[item]}</span>
+              </button>
+            );
+          })}
         </div>
       )}
       {years.length > 0 ? (
         <select
-          value={joined}
+          value={joinedValue}
           onChange={(e) => setJoined(e.target.value)}
           aria-label="入団年"
           className="h-14 w-full rounded-[var(--radius-lg)] bg-card px-3 text-base text-foreground shadow-[var(--shadow-border)] outline-none"
@@ -132,7 +160,13 @@ function PlayersPage() {
           ))}
         </select>
       ) : null}
+      {yearCleared ? (
+        <p className="text-sm text-muted-foreground">{joined}年入団の選手は、この条件にいません。入団年をはずしています。</p>
+      ) : null}
       <p className="text-xs tabular-nums text-muted-foreground">{filtered.length} 人</p>
+      {filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground">該当する選手はいません。</p>
+      ) : null}
       <div className="grid gap-3 sm:grid-cols-2">
         {filtered.map((player) => (
           <PlayerCard
