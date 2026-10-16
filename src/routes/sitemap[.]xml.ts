@@ -11,9 +11,12 @@ export const Route = createFileRoute("/sitemap.xml")({
         const { players, lineups } = catalogFromSheetData({ sheet });
         const urls = [
           `${origin}/`,
-          `${origin}/players`,
           `${origin}/matches`,
+          `${origin}/players`,
+          `${origin}/articles`,
+          `${origin}/sources`,
           `${origin}/links`,
+          `${origin}/about`,
           ...lineups.map((lineup) => `${origin}/matches/${lineup.id}`),
           ...players.filter((player) => !player.unlisted).map((player) => `${origin}/players/${player.slug}`),
         ];
