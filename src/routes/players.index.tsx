@@ -62,11 +62,10 @@ function PlayersPage() {
     const counts = new Map<Position, number>();
     for (const player of base) {
       if (player.related || player.unlisted) continue;
-      if (joinedValue !== "all" && player.joined !== joinedValue) continue;
       counts.set(player.position, (counts.get(player.position) ?? 0) + 1);
     }
     return counts;
-  }, [base, joinedValue]);
+  }, [base]);
 
   const positions =
     unit === "FW" || unit === "BK" ? POSITIONS.filter((p) => POSITION_UNIT[p] === unit) : POSITIONS;
@@ -99,6 +98,7 @@ function PlayersPage() {
             onClick={() => {
               setUnit(item.id);
               setPosition("all");
+              setJoined("all");
             }}
             className={cn(
               "h-11 shrink-0 rounded-full px-3 text-xs",
@@ -113,7 +113,10 @@ function PlayersPage() {
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
-            onClick={() => setPosition("all")}
+            onClick={() => {
+              setPosition("all");
+              setJoined("all");
+            }}
             className={cn(
               "col-span-2 min-h-14 rounded-[var(--radius-lg)] px-3 text-base",
               position === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
@@ -129,7 +132,10 @@ function PlayersPage() {
                 key={item}
                 type="button"
                 disabled={count === 0}
-                onClick={() => setPosition(item)}
+                onClick={() => {
+                  setPosition(item);
+                  setJoined("all");
+                }}
                 className={cn(
                   "flex min-h-16 flex-col items-center justify-center rounded-[var(--radius-lg)] px-2",
                   selected
