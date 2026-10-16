@@ -15,8 +15,8 @@
   --color-ring: #7ea0c4;
   --color-destructive: #c47a7a;
 
-  --font-sans: "Aptos", "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-  --font-display: "Aptos Display", "Aptos", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-sans: "Aptos", -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", "Segoe UI", sans-serif;
+  --font-display: "Aptos Display", "Aptos", -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --radius-xs: 4px;
