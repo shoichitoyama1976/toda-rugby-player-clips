@@ -118,31 +118,19 @@ function PlayersPage() {
         </div>
       )}
       {years.length > 0 ? (
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-          <button
-            type="button"
-            onClick={() => setJoined("all")}
-            className={cn(
-              "h-11 shrink-0 rounded-full px-3 text-xs",
-              joined === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
-            )}
-          >
-            すべての入団年
-          </button>
+        <select
+          value={joined}
+          onChange={(e) => setJoined(e.target.value)}
+          aria-label="入団年"
+          className="h-14 w-full rounded-[var(--radius-lg)] bg-card px-3 text-base text-foreground shadow-[var(--shadow-border)] outline-none"
+        >
+          <option value="all">すべての入団年</option>
           {years.map((year) => (
-            <button
-              key={year}
-              type="button"
-              onClick={() => setJoined(year)}
-              className={cn(
-                "h-11 shrink-0 rounded-full px-3 text-xs",
-                joined === year ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
-              )}
-            >
+            <option key={year} value={year}>
               {year}年入団
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       ) : null}
       <p className="text-xs tabular-nums text-muted-foreground">{filtered.length} 人</p>
       <div className="grid gap-3 sm:grid-cols-2">
