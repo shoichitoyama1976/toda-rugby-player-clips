@@ -41,6 +41,7 @@ export const Route = createRootRoute({
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
+      { rel: "stylesheet", href: "/fonts/noto-sans-jp.css", media: "print" },
     ],
     scripts: [
       {
@@ -58,7 +59,7 @@ export const Route = createRootRoute({
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{if(localStorage.getItem("outdoor-display")==="1"){document.documentElement.setAttribute("data-outdoor","1");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content","#f4f1e8")}}catch(e){}})();`,
+            __html: `(function(){try{var f=document.querySelector('link[href="/fonts/noto-sans-jp.css"]');if(f)f.media="all";if(localStorage.getItem("outdoor-display")==="1"){document.documentElement.setAttribute("data-outdoor","1");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content","#f4f1e8")}}catch(e){}})();`,
           }}
         />
       </head>
