@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { isBrokenArticleUrl } from "@/data/broken-links";
 import type { Article } from "@/data/types";
 import { formatDate, isYoutubeClip } from "@/lib/format";
-import { trackReadOriginal } from "@/lib/analytics";
 import { useClipStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -65,7 +64,6 @@ export function ArticleCard({
             href={article.url}
             target="_blank"
             rel="noreferrer"
-            onClick={() => trackReadOriginal(article.url, article.title)}
             className="inline-flex h-11 items-center gap-1.5 pr-2 text-sm text-accent hover:text-foreground"
           >
             原文を読む{youtube ? "（音あり注意）" : ""}

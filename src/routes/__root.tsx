@@ -1,12 +1,10 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
-import { GoogleAnalytics } from "@/components/google-analytics";
 import { SiteShell } from "@/components/site-shell";
 import { loadPublicSheet } from "@/lib/load-sheet";
 import { loadPlayerNotices } from "@/lib/profile-requests";
 import { loadRequestOrigin } from "@/lib/seo";
-import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "戸田ラグビー選手記事帖";
@@ -43,15 +41,6 @@ export const Route = createRootRoute({
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
       { rel: "stylesheet", href: "/fonts/noto-sans-jp.css", media: "print" },
     ],
-    scripts: [
-      {
-        async: true,
-        src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`,
-      },
-      {
-        children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}');`,
-      },
-    ],
   }),
   component: () => (
     <html lang="ja" suppressHydrationWarning>
@@ -65,7 +54,6 @@ export const Route = createRootRoute({
       </head>
       <body className="antialiased">
         <PreviewHostBridge />
-        <GoogleAnalytics />
         <AuthProvider>
           <SiteShell>
             <Outlet />

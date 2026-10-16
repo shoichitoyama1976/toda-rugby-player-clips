@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { isBrokenArticleUrl } from "@/data/broken-links";
 import { KIND_LABEL, POSITION_LABEL } from "@/data/types";
 import { formatDate, isYoutubeClip } from "@/lib/format";
-import { trackReadOriginal } from "@/lib/analytics";
 import { catalogFromHeadMatches, SITE_NAME } from "@/lib/seo";
 import { useClipStore } from "@/lib/store";
 import { useCatalog } from "@/lib/use-catalog";
@@ -83,7 +82,6 @@ function ArticlePage() {
                 href={article.url}
                 target="_blank"
                 rel="noreferrer"
-                onClick={() => trackReadOriginal(article.url, article.title)}
               >
                 原文を読む{youtube ? "（音あり注意）" : ""}
                 <ExternalLink className="size-4" />
