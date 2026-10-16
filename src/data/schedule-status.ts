@@ -5,5 +5,5 @@ export const LINEUP_SCHEDULE = {
   intervalMs: 24 * 60 * 60 * 1000,
   expiresAt: "2026-10-23T08:56:00.000Z",
   lastResultUrl: null as string | null,
-  lastResultNote: "予約を作り直した。次回の木曜か金曜に取得する",
+  lastResultNote: "同じ試合が Drive にあり中身も同じなら、ファイルは作らない",
 };

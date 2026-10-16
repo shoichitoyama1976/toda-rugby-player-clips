@@ -169,7 +169,7 @@ export function PreviewStatus() {
     setContinued(false);
     try {
       await navigator.clipboard.writeText(
-        `試合メンバーの定期実行を、同じ内容で7日続けてください。予約IDは ${LINEUP_SCHEDULE.id} です。\n取得結果はスプレッドシートではなく、GitHubの src/data/matches.csv と src/data/lineups.csv に足してください。日付は yyyy/MM/dd、キックオフは hh:mm:ss です。\n\n`,
+        `試合メンバーの定期実行を、同じ内容で7日続けてください。予約IDは ${LINEUP_SCHEDULE.id} です。\n同じ試合のラインナップが Google Drive のフォルダに既にあり、中身が一致するときは、新しいファイルを作らないでください。\n無ければ、そのフォルダと GitHub の src/data/matches.csv、src/data/lineups.csv に足してください。日付は yyyy/MM/dd、キックオフは hh:mm:ss です。\nフォルダ: https://drive.google.com/drive/folders/1CfgST6FmhrbaGPx0f95Sq4yvnIG8wAuU\n\n`,
       );
       setContinued(true);
     } catch {
