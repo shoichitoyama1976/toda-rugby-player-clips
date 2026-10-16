@@ -90,7 +90,7 @@ function PlayersPage() {
         ))}
       </div>
       {unit === "other" ? null : (
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      <div className="flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => setPosition("all")}
