@@ -74,7 +74,7 @@ function MatchPage() {
         <div className="mt-1 flex flex-col items-start">
           <XLink href={sourceUrl} label="レビンズの公式Xの投稿を開く" />
           {lineup.opponentUrl ? (
-            <XLink href={lineup.opponentUrl} label={`${lineup.opponent}の公式Xを開く`} />
+            <XLink href={lineup.opponentUrl} label={`${lineup.opponent}の公式Xの投稿を開く`} />
           ) : null}
         </div>
       </header>
