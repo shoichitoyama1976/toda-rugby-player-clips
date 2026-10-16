@@ -22,13 +22,13 @@ function isStaffOrRelated(player: Player): boolean {
 function PlayersPage() {
   const { players, countBySlug } = useCatalog();
   const [query, setQuery] = useState("");
-  const [unit, setUnit] = useState<"all" | "FW" | "BK" | "other">("all");
-  const [position, setPosition] = useState<Position | "all">("all");
+  const [unit, setUnit] = useState<"all" | "FW" | "BK" | "other" | null>(null);
+  const [position, setPosition] = useState<Position | "all" | null>(null);
   const [joined, setJoined] = useState<"all" | string>("all");
 
   const base = useMemo(() => {
     return searchPlayers(players, query).filter((player) => {
-      if (unit === "all") return true;
+      if (unit === null || unit === "all") return true;
       if (unit === "other") return isStaffOrRelated(player);
       return isRosterPlayer(player) && POSITION_UNIT[player.position] === unit;
     });
@@ -36,7 +36,7 @@ function PlayersPage() {
 
   const years = useMemo(() => {
     const pool =
-      position === "all"
+      position === null || position === "all"
         ? base
         : base.filter((player) => !player.related && !player.unlisted && player.position === position);
     const set = new Set<string>();
@@ -52,7 +52,7 @@ function PlayersPage() {
   const filtered = useMemo(() => {
     return base
       .filter((player) =>
-        position === "all" ? true : !player.related && !player.unlisted && player.position === position,
+        position === null || position === "all" ? true : !player.related && !player.unlisted && player.position === position,
       )
       .filter((player) => (joinedValue === "all" ? true : player.joined === joinedValue))
       .sort(comparePlayers);
@@ -97,7 +97,7 @@ function PlayersPage() {
             type="button"
             onClick={() => {
               setUnit(item.id);
-              setPosition("all");
+              setPosition(null);
               setJoined("all");
             }}
             className={cn(
@@ -109,7 +109,7 @@ function PlayersPage() {
           </button>
         ))}
       </div>
-      {unit === "other" ? null : (
+      {unit !== null && unit !== "other" ? (
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
@@ -151,7 +151,7 @@ function PlayersPage() {
           })}
         </div>
       )}
-      {years.length > 0 ? (
+      {unit === "other" || position !== null ? (
         <select
           value={joinedValue}
           onChange={(e) => setJoined(e.target.value)}
