@@ -1,6 +1,7 @@
 import { useLoaderData } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { LINEUPS } from "@/data/lineups";
+import { LINEUPS_CSV, MATCHES_CSV } from "@/data/match-archive";
 import { SHEET_CACHE_MS } from "@/data/sheet-config";
 import { articlesForPlayer, buildSheetLineups, matchSheet, resolveCatalog } from "./catalog";
 
@@ -18,11 +19,8 @@ export function useCatalog() {
     const csv = sheet.ok ? sheet.csv : null;
     const playersCsv = sheet.ok ? sheet.playersCsv : null;
     const catalog = resolveCatalog(csv, playersCsv);
-    const matches = matchSheet(sheet.ok ? sheet.matchesCsv : null);
-    const lineups = buildSheetLineups(
-      sheet.ok ? sheet.lineupsCsv : null,
-      sheet.ok ? sheet.matchesCsv : null,
-    );
+    const matches = matchSheet(MATCHES_CSV);
+    const lineups = buildSheetLineups(LINEUPS_CSV, MATCHES_CSV);
     const players = catalog.players;
     const countBySlug = new Map<string, number>();
     for (const player of players) {
@@ -45,8 +43,8 @@ export function useCatalog() {
       sheetRows: {
         clips: sheet.ok ? dataRows(sheet.csv) : 0,
         players: sheet.ok ? dataRows(sheet.playersCsv) : 0,
-        matches: sheet.ok ? dataRows(sheet.matchesCsv) : 0,
-        lineups: sheet.ok ? dataRows(sheet.lineupsCsv) : 0,
+        matches: dataRows(MATCHES_CSV),
+        lineups: dataRows(LINEUPS_CSV),
       },
       origin: data.origin ?? "",
     };

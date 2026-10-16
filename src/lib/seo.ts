@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { POSITION_LABEL, type Article, type Player } from "@/data/types";
 import { articlesForPlayer, buildSheetLineups, resolveCatalog } from "@/lib/catalog";
 import { LINEUPS, type Lineup } from "@/data/lineups";
+import { LINEUPS_CSV, MATCHES_CSV } from "@/data/match-archive";
 
 export const SITE_NAME = "戸田ラグビー選手記事帖";
 
@@ -32,7 +33,7 @@ export function catalogFromSheetData(data: unknown): {
   const catalog = sheet?.ok
     ? resolveCatalog(sheet.csv ?? null, sheet.playersCsv ?? null)
     : resolveCatalog(null, null);
-  const lineups = sheet?.ok ? buildSheetLineups(sheet.lineupsCsv, sheet.matchesCsv) : [];
+  const lineups = buildSheetLineups(LINEUPS_CSV, MATCHES_CSV);
   return { ...catalog, lineups: lineups.length > 0 ? lineups : LINEUPS };
 }
 

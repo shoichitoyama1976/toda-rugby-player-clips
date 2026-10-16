@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { ARTICLE_TAB_NAMES, LINEUP_TAB_NAMES, MATCH_TAB_NAMES, PLAYER_TAB_NAMES } from "@/data/types";
+import { ARTICLE_TAB_NAMES, PLAYER_TAB_NAMES } from "@/data/types";
 import { PUBLIC_SHEET_URL, SHEET_CACHE_MS } from "@/data/sheet-config";
 import { classifyCsv } from "./catalog";
 import { scheduleNameCheck } from "./name-check";
@@ -91,19 +91,25 @@ async function readPublicSheet(force: boolean): Promise<SheetLoadResult> {
 
   const id = spreadsheetIdFromUrl(url);
   const named = id
-    ? [...ARTICLE_TAB_NAMES, ...PLAYER_TAB_NAMES, ...MATCH_TAB_NAMES, ...LINEUP_TAB_NAMES].map((name) => gvizCsvUrl(id, name))
+    ? [...ARTICLE_TAB_NAMES, ...PLAYER_TAB_NAMES].map((name) => gvizCsvUrl(id, name))
     : [];
-  const gids = id ? await discoverGids(id, url, force) : [];
-  const byGid = id ? gids.map((gid) => csvExportByGid(id, gid)) : [];
-  const unique = [...new Set([csvUrl, ...named, ...byGid])];
-  const texts = (await Promise.all(unique.map((target) => fetchText(target, force)))).filter(
+  const first = (await Promise.all([csvUrl, ...named].map((target) => fetchText(target, force)))).filter(
     (text): text is string => Boolean(text),
   );
+  let texts = first;
+  if (!pickByKind(texts, "articles") || !pickByKind(texts, "players")) {
+    const gids = id ? await discoverGids(id, url, force) : [];
+    const byGid = id ? gids.map((gid) => csvExportByGid(id, gid)) : [];
+    const extra = (await Promise.all(byGid.map((target) => fetchText(target, force)))).filter(
+      (text): text is string => Boolean(text),
+    );
+    texts = [...texts, ...extra];
+  }
 
   const articlesCsv = pickByKind(texts, "articles");
   const playersCsv = pickByKind(texts, "players");
-  const matchesCsv = pickByKind(texts, "matches");
-  const lineupsCsv = pickByKind(texts, "lineups");
+  const matchesCsv = null;
+  const lineupsCsv = null;
   const fetchedAt = Date.now();
 
   if (!articlesCsv && !playersCsv) {
