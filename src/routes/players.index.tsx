@@ -90,31 +90,32 @@ function PlayersPage() {
         ))}
       </div>
       {unit === "other" ? null : (
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => setPosition("all")}
-          className={cn(
-            "h-11 shrink-0 rounded-full px-3 text-xs",
-            position === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
-          )}
-        >
-          すべてのポジション
-        </button>
-        {positions.map((item) => (
+        <div className="grid grid-cols-2 gap-2">
           <button
-            key={item}
             type="button"
-            onClick={() => setPosition(item)}
+            onClick={() => setPosition("all")}
             className={cn(
-              "h-11 shrink-0 rounded-full px-3 text-xs",
-              position === item ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
+              "col-span-2 min-h-14 rounded-[var(--radius-lg)] px-3 text-base",
+              position === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
             )}
           >
-            {item} {POSITION_LABEL[item]}
+            すべてのポジション
           </button>
-        ))}
-      </div>
+          {positions.map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => setPosition(item)}
+              className={cn(
+                "flex min-h-16 flex-col items-center justify-center rounded-[var(--radius-lg)] px-2",
+                position === item ? "bg-primary text-primary-foreground" : "bg-card text-foreground shadow-[var(--shadow-border)]",
+              )}
+            >
+              <span className="font-display text-lg leading-none">{item}</span>
+              <span className="mt-1 text-sm">{POSITION_LABEL[item]}</span>
+            </button>
+          ))}
+        </div>
       )}
       {years.length > 0 ? (
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
