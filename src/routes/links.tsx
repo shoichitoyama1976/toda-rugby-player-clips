@@ -9,36 +9,36 @@ export const Route = createFileRoute("/links")({
       { title: `リンク｜${SITE_NAME}` },
       {
         name: "description",
-        content: "レビンズの試合へ向かうときに開くサイトです。レビンズ公式と、それ以外に分けています。",
+        content: "レビンズの試合へ向かうときに開くサイトです。レビンズと、その他に分けています。",
       },
     ],
   }),
   component: LinksPage,
 });
 
-type LinkItem = { href: string; label: string; operator: string };
+type LinkItem = { href: string; label: string; group: string };
 
 function sheetLinks(): LinkItem[] {
   const rows = parseDelimited(linksCsv);
   if (rows.length < 2) return [];
   const header = rows[0];
   const index = (name: string) => header.indexOf(name);
-  const operator = index("運営");
+  const group = index("グループ");
   const label = index("サイト名");
   const url = index("URL");
   return rows.slice(1).flatMap((row) => {
     const href = row[url]?.trim() ?? "";
     const name = row[label]?.trim() ?? "";
     if (!/^https?:\/\//i.test(href) || !name) return [];
-    return [{ href, label: name, operator: row[operator]?.trim() ?? "" }];
+    return [{ href, label: name, group: row[group]?.trim() || "その他" }];
   });
 }
 
 const ITEMS = sheetLinks();
-const GROUPS = [
-  { title: "レビンズ公式", links: ITEMS.filter((item) => item.operator === "レビンズ公式") },
-  { title: "その他", links: ITEMS.filter((item) => item.operator !== "レビンズ公式") },
-];
+const GROUPS = [...new Set(ITEMS.map((item) => item.group))].map((title) => ({
+  title,
+  links: ITEMS.filter((item) => item.group === title),
+}));
 
 function LinksPage() {
   return (
@@ -47,7 +47,7 @@ function LinksPage() {
         <p className="text-[11px] tracking-[0.18em] text-accent">LINK</p>
         <h1 className="mt-3 font-display text-3xl tracking-tight">リンク</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          会場へ向かうとき、キックオフまでの待ち時間に開く場所です。レビンズ公式と、それ以外に分けています。
+          会場へ向かうとき、キックオフまでの待ち時間に開く場所です。レビンズと、その他に分けています。
         </p>
       </header>
 
@@ -64,9 +64,7 @@ function LinksPage() {
                   rel="noreferrer"
                   className="block rounded-[var(--radius-lg)] bg-card px-4 py-3 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
                 >
-                  <p className="text-base text-foreground">
-                    {group.title === "その他" ? `${item.operator} ${item.label}` : item.label}
-                  </p>
+                  <p className="text-base text-foreground">{item.label}</p>
                 </a>
               ))}
             </div>
