@@ -44,6 +44,7 @@ Grok の `grok.me` は、作っている途中を見るためのものです。�
 | `src/data/clips.csv` | 掲載記事 |
 | `src/data/matches.csv` | 試合 |
 | `src/data/lineups.csv` | 出場メンバー |
+| `src/data/links.csv` | リンク集。運営が「レビンズ公式」の行と、それ以外で分けて出します |
 
 スプレッドシートは、記事やメンバーを書き溜める作業用です。直したあとは、同じ内容を上の CSV に写してこのリポジトリへ残します。Cloudflare が `main` をビルドすると、公開サイトに載ります。
 

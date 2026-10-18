@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import linksCsv from "@/data/links.csv?raw";
+import { parseDelimited } from "@/lib/csv";
 import { SITE_NAME } from "@/lib/seo";
 
 export const Route = createFileRoute("/links")({
@@ -7,45 +9,36 @@ export const Route = createFileRoute("/links")({
       { title: `リンク｜${SITE_NAME}` },
       {
         name: "description",
-        content: "レビンズの試合へ向かうとき、キックオフまでに開く公式サイトの一覧です。",
+        content: "レビンズの試合へ向かうときに開くサイトです。レビンズ公式と、それ以外に分けています。",
       },
     ],
   }),
   component: LinksPage,
 });
 
+type LinkItem = { href: string; label: string; operator: string };
+
+function sheetLinks(): LinkItem[] {
+  const rows = parseDelimited(linksCsv);
+  if (rows.length < 2) return [];
+  const header = rows[0];
+  const index = (name: string) => header.indexOf(name);
+  const operator = index("運営");
+  const label = index("サイト名");
+  const url = index("URL");
+  return rows.slice(1).flatMap((row) => {
+    const href = row[url]?.trim() ?? "";
+    const name = row[label]?.trim() ?? "";
+    if (!/^https?:\/\//i.test(href) || !name) return [];
+    return [{ href, label: name, operator: row[operator]?.trim() ?? "" }];
+  });
+}
+
+const ITEMS = sheetLinks();
 const GROUPS = [
-  {
-    title: "試合の前に",
-    links: [
-      {
-        href: "https://www.yakult.co.jp/sports/rugby/",
-        label: "レビンズ公式サイト",
-        note: "お知らせと日程",
-      },
-      {
-        href: "https://www.yakult.co.jp/sports/rugby/member/",
-        label: "公式の選手一覧",
-        note: "クラブが発表しているプロフィール",
-      },
-      {
-        href: "https://x.com/yakultlevins",
-        label: "レビンズ公式X",
-        note: "出場メンバーはここに出ます",
-      },
-      {
-        href: "https://note.com/yakultlevins",
-        label: "レビンズ公式note",
-        note: "選手の文章",
-      },
-      {
-        href: "https://league-one.jp/",
-        label: "リーグワン",
-        note: "順位と試合",
-      },
-    ],
-  },
-] as const;
+  { title: "レビンズ公式", links: ITEMS.filter((item) => item.operator === "レビンズ公式") },
+  { title: "その他", links: ITEMS.filter((item) => item.operator !== "レビンズ公式") },
+];
 
 function LinksPage() {
   return (
@@ -54,29 +47,33 @@ function LinksPage() {
         <p className="text-[11px] tracking-[0.18em] text-accent">LINK</p>
         <h1 className="mt-3 font-display text-3xl tracking-tight">リンク</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          会場へ向かうとき、キックオフまでの待ち時間に開く場所です。公式のサイトと、このサイトの出場メンバーです。
+          会場へ向かうとき、キックオフまでの待ち時間に開く場所です。レビンズ公式と、それ以外に分けています。
         </p>
       </header>
 
-      {GROUPS.map((group) => (
-        <section key={group.title} className="space-y-3">
-          <h2 className="font-display text-xl tracking-tight">{group.title}</h2>
-          <div className="grid gap-3">
-            {group.links.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                className="block rounded-[var(--radius-lg)] bg-card px-4 py-3 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
-              >
-                <p className="text-base text-foreground">{item.label}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{item.note}</p>
-              </a>
-            ))}
-          </div>
-        </section>
-      ))}
+      {GROUPS.map((group) =>
+        group.links.length === 0 ? null : (
+          <section key={group.title} className="space-y-3">
+            <h2 className="font-display text-xl tracking-tight">{group.title}</h2>
+            <div className="grid gap-3">
+              {group.links.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block rounded-[var(--radius-lg)] bg-card px-4 py-3 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
+                >
+                  <p className="text-base text-foreground">{item.label}</p>
+                  {group.title === "その他" ? (
+                    <p className="mt-1 text-sm text-muted-foreground">{item.operator}</p>
+                  ) : null}
+                </a>
+              ))}
+            </div>
+          </section>
+        ),
+      )}
 
       <section className="space-y-3">
         <h2 className="font-display text-xl tracking-tight">このサイト</h2>
