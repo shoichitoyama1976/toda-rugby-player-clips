@@ -411,6 +411,7 @@ export function matchPostUrls(csv: string | null | undefined): Record<string, st
 }
 
 function lineupUnit(appearance: string, group: string): LineupUnit {
+  if (/変更前|当初/.test(appearance)) return "P";
   if (/リザーブ|reserve|^r$/i.test(`${appearance}${group}`)) return "R";
   if (/^bk$/i.test(group)) return "BK";
   return "FW";

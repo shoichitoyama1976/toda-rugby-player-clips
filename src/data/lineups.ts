@@ -1,4 +1,4 @@
-export type LineupUnit = "FW" | "BK" | "R";
+export type LineupUnit = "FW" | "BK" | "R" | "P";
 
 export type LineupSlot = {
   unit: LineupUnit;

@@ -28,10 +28,11 @@ export const Route = createFileRoute("/matches/$id")({
   },
 });
 
-const UNITS: Array<{ id: LineupUnit; label: string }> = [
+const UNITS: Array<{ id: LineupUnit; label: string; note?: string }> = [
   { id: "FW", label: "FW" },
   { id: "BK", label: "BK" },
   { id: "R", label: "リザーブ" },
+  { id: "P", label: "変更前", note: "最初に発表されていた人です。" },
 ];
 
 function MatchPage() {
@@ -85,6 +86,7 @@ function MatchPage() {
         return (
           <section key={unit.id}>
             <h2 className="font-display text-xl tracking-tight">{unit.label}</h2>
+            {unit.note ? <p className="mt-1 text-sm text-muted-foreground">{unit.note}</p> : null}
             <div className="mt-3 grid gap-2">
               {slots.map((slot) => (
                 <SlotRow
