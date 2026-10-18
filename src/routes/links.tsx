@@ -64,10 +64,9 @@ function LinksPage() {
                   rel="noreferrer"
                   className="block rounded-[var(--radius-lg)] bg-card px-4 py-3 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
                 >
-                  <p className="text-base text-foreground">{item.label}</p>
-                  {group.title === "その他" ? (
-                    <p className="mt-1 text-sm text-muted-foreground">{item.operator}</p>
-                  ) : null}
+                  <p className="text-base text-foreground">
+                    {group.title === "その他" ? `${item.operator} ${item.label}` : item.label}
+                  </p>
                 </a>
               ))}
             </div>
