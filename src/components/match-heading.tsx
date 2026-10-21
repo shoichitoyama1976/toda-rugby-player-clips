@@ -16,10 +16,7 @@ export function MatchHeading({
   const day = lineup.weekday || weekday(lineup.date);
   return (
     <>
-      <p className="text-[11px] tracking-[0.18em] text-accent">
-        {lineup.label}
-        {lineup.side ? ` · ${lineup.side}` : ""}
-      </p>
+      <p className="text-[11px] tracking-[0.18em] text-accent">{lineup.label}</p>
       <Title className="mt-2 font-display text-3xl leading-tight tracking-tight sm:text-4xl">
         ヤクルトレビンズ戸田 vs {lineup.opponent}
       </Title>
@@ -36,7 +33,10 @@ export function MatchHeading({
           {formatDate(lineup.date)}（{day}）
         </p>
         <p>{lineup.kickoff} K.O.</p>
-        <p>{lineup.venue}</p>
+        <p>
+          {lineup.venue}
+          {lineup.side ? `（${lineup.side}）` : ""}
+        </p>
       </div>
     </>
   );
