@@ -90,7 +90,11 @@ function Home() {
         >
           <p className="text-[11px] tracking-[0.18em] text-accent">試合メンバーから記事へ</p>
           <p className="mt-2 font-display text-2xl leading-tight">vs {nextMatch.opponent}</p>
-          <MatchScore levins={nextMatch.levinsScore} opponent={nextMatch.opponentScore} />
+          <MatchScore
+            levins={nextMatch.levinsScore}
+            opponent={nextMatch.opponentScore}
+            opponentName={nextMatch.opponent}
+          />
           <div className="mt-3 space-y-1 text-sm text-muted-foreground">
             <p>
               {formatDate(nextMatch.date)}

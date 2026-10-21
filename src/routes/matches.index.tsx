@@ -47,7 +47,11 @@ function MatchCard({ lineup }: { lineup: Lineup }) {
     >
       <p className="text-[11px] tracking-wide text-accent">{lineup.label}</p>
       <p className="mt-2 font-display text-2xl leading-tight">vs {lineup.opponent}</p>
-      <MatchScore levins={lineup.levinsScore} opponent={lineup.opponentScore} />
+      <MatchScore
+        levins={lineup.levinsScore}
+        opponent={lineup.opponentScore}
+        opponentName={lineup.opponent}
+      />
       <div className="mt-3 space-y-1 text-sm text-muted-foreground">
         <p>
           {formatDate(lineup.date)}（{lineup.weekday || weekday(lineup.date)}）
