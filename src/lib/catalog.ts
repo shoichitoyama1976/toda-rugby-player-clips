@@ -357,6 +357,8 @@ export type SheetMatch = {
   kickoff: string;
   postUrl: string;
   opponentUrl: string;
+  levinsScore?: number;
+  opponentScore?: number;
 };
 
 function sheetDate(value: string): string {
@@ -368,6 +370,12 @@ function sheetDate(value: string): string {
 function dateFromMatchId(id: string): string {
   const match = id.match(/^(\d{4})(\d{2})(\d{2})/);
   return match ? `${match[1]}-${match[2]}-${match[3]}` : "";
+}
+
+function scoreNumber(value: string): number | undefined {
+  const trimmed = value.trim();
+  if (!/^\d+$/.test(trimmed)) return undefined;
+  return Number(trimmed);
 }
 
 function positiveNumber(value: string): number | undefined {
@@ -397,6 +405,8 @@ export function matchSheet(csv: string | null | undefined): Record<string, Sheet
       kickoff: pick(row, index, ["キックオフ"]),
       postUrl: url ?? "",
       opponentUrl: opponentUrl ?? "",
+      levinsScore: scoreNumber(pick(row, index, ["レビンズ得点"])),
+      opponentScore: scoreNumber(pick(row, index, ["相手得点"])),
     };
   }
   return matches;
@@ -444,6 +454,8 @@ export function buildSheetLineups(
         postUrl: meta?.postUrl || "",
         opponentUrl: meta?.opponentUrl || "",
         weekday: meta?.weekday || "",
+        levinsScore: meta?.levinsScore,
+        opponentScore: meta?.opponentScore,
         slots: [],
       };
       byId.set(id, lineup);

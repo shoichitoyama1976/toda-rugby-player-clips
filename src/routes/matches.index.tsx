@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Lineup } from "@/data/lineups";
+import { MatchScore } from "@/components/match-score";
 import { formatDate } from "@/lib/format";
 import { SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
@@ -46,6 +47,7 @@ function MatchCard({ lineup }: { lineup: Lineup }) {
     >
       <p className="text-[11px] tracking-wide text-accent">{lineup.label}</p>
       <p className="mt-2 font-display text-2xl leading-tight">vs {lineup.opponent}</p>
+      <MatchScore levins={lineup.levinsScore} opponent={lineup.opponentScore} />
       <div className="mt-3 space-y-1 text-sm text-muted-foreground">
         <p>
           {formatDate(lineup.date)}（{lineup.weekday || weekday(lineup.date)}）

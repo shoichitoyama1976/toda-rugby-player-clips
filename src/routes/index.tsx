@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/json-ld";
 import { PlayerCard } from "@/components/player-card";
 import { Input } from "@/components/ui/input";
 import { comparePlayers, searchPlayers } from "@/lib/catalog";
+import { MatchScore } from "@/components/match-score";
 import { formatDate } from "@/lib/format";
 import { websiteJsonLd } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
@@ -89,6 +90,7 @@ function Home() {
         >
           <p className="text-[11px] tracking-[0.18em] text-accent">試合メンバーから記事へ</p>
           <p className="mt-2 font-display text-2xl leading-tight">vs {nextMatch.opponent}</p>
+          <MatchScore levins={nextMatch.levinsScore} opponent={nextMatch.opponentScore} />
           <div className="mt-3 space-y-1 text-sm text-muted-foreground">
             <p>
               {formatDate(nextMatch.date)}

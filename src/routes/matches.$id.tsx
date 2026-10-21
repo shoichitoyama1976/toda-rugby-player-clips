@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LineupSlot, LineupUnit } from "@/data/lineups";
 import { matchPlayerSlug } from "@/lib/catalog";
+import { MatchScore } from "@/components/match-score";
 import { formatDate, formatMonthDay } from "@/lib/format";
 import { catalogFromHeadMatches, SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
@@ -61,6 +62,7 @@ function MatchPage() {
         <h1 className="mt-2 font-display text-3xl leading-tight tracking-tight sm:text-4xl">
           ヤクルトレビンズ戸田 vs {lineup.opponent}
         </h1>
+        <MatchScore levins={lineup.levinsScore} opponent={lineup.opponentScore} />
         <div className="mt-3 space-y-1 text-sm text-muted-foreground">
           <p>
             {formatDate(lineup.date)}（{day}）

@@ -23,6 +23,9 @@ export type Lineup = {
   postUrl: string;
   opponentUrl?: string;
   weekday?: string;
+  /** 終了した試合だけ。未入力は出さない。 */
+  levinsScore?: number;
+  opponentScore?: number;
   slots: LineupSlot[];
 };
 
