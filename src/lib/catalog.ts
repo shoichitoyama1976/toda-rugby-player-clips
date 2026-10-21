@@ -359,6 +359,7 @@ export type SheetMatch = {
   opponentUrl: string;
   levinsScore?: number;
   opponentScore?: number;
+  side: "" | "ホーム" | "ビジター" | "中立";
 };
 
 function sheetDate(value: string): string {
@@ -370,6 +371,12 @@ function sheetDate(value: string): string {
 function dateFromMatchId(id: string): string {
   const match = id.match(/^(\d{4})(\d{2})(\d{2})/);
   return match ? `${match[1]}-${match[2]}-${match[3]}` : "";
+}
+
+function matchSide(value: string): SheetMatch["side"] {
+  const text = value.trim();
+  if (text === "ホーム" || text === "ビジター" || text === "中立") return text;
+  return "";
 }
 
 function scoreNumber(value: string): number | undefined {
@@ -407,6 +414,7 @@ export function matchSheet(csv: string | null | undefined): Record<string, Sheet
       opponentUrl: opponentUrl ?? "",
       levinsScore: scoreNumber(pick(row, index, ["レビンズ得点"])),
       opponentScore: scoreNumber(pick(row, index, ["相手得点"])),
+      side: matchSide(pick(row, index, ["ホームビジター", "ホーム／ビジター"])),
     };
   }
   return matches;
@@ -547,6 +555,7 @@ export function buildSheetLineups(
         weekday: meta?.weekday || "",
         levinsScore: meta?.levinsScore,
         opponentScore: meta?.opponentScore,
+        side: meta?.side || "",
         slots: [],
       };
       byId.set(id, lineup);

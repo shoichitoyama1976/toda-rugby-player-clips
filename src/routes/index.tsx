@@ -5,8 +5,8 @@ import { ArticleCard } from "@/components/article-card";
 import { JsonLd } from "@/components/json-ld";
 import { PlayerCard } from "@/components/player-card";
 import { Input } from "@/components/ui/input";
-import { comparePlayers, searchPlayers, teamLabel, teamLogo } from "@/lib/catalog";
-import { MatchScore } from "@/components/match-score";
+import { comparePlayers, searchPlayers } from "@/lib/catalog";
+import { MatchHeading } from "@/components/match-heading";
 import { formatDate } from "@/lib/format";
 import { websiteJsonLd } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
@@ -135,24 +135,7 @@ function Home() {
           params={{ id: upcomingMatch.id }}
           className="block rounded-[var(--radius-xl)] bg-card p-5 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
         >
-          <p className="text-[11px] tracking-[0.18em] text-accent">試合メンバーから記事へ</p>
-          <p className="mt-2 font-display text-2xl leading-tight">vs {upcomingMatch.opponent}</p>
-          <MatchScore
-            levins={upcomingMatch.levinsScore}
-            opponent={upcomingMatch.opponentScore}
-            levinsName={teamLabel(teams, "ヤクルトレビンズ戸田")}
-            opponentName={teamLabel(teams, upcomingMatch.opponent)}
-            levinsLogo={teamLogo(teams, "ヤクルトレビンズ戸田")}
-            opponentLogo={teamLogo(teams, upcomingMatch.opponent)}
-          />
-          <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-            <p>
-              {formatDate(upcomingMatch.date)}
-              {upcomingMatch.weekday ? `（${upcomingMatch.weekday}）` : ""}
-            </p>
-            <p>{upcomingMatch.kickoff} K.O.</p>
-            <p>{upcomingMatch.venue}</p>
-          </div>
+          <MatchHeading lineup={upcomingMatch} teams={teams} />
           <p className="mt-3 inline-flex items-center gap-1 text-sm text-foreground">
             出場メンバーを見る
             <ArrowRight className="size-3.5" />

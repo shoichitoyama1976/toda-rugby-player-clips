@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LineupSlot, LineupUnit } from "@/data/lineups";
-import { matchPlayerSlug, teamLabel, teamLogo } from "@/lib/catalog";
-import { MatchScore } from "@/components/match-score";
-import { formatDate, formatMonthDay } from "@/lib/format";
+import { matchPlayerSlug } from "@/lib/catalog";
+import { MatchHeading } from "@/components/match-heading";
+import { formatMonthDay } from "@/lib/format";
 import { catalogFromHeadMatches, SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
 import { cn } from "@/lib/utils";
@@ -53,30 +53,11 @@ function MatchPage() {
   }
 
   const sourceUrl = lineup.postUrl;
-  const day = lineup.weekday || weekday(lineup.date);
 
   return (
     <div className="space-y-6">
       <header className="max-w-2xl">
-        <p className="text-[11px] tracking-[0.18em] text-accent">{lineup.label}</p>
-        <h1 className="mt-2 font-display text-3xl leading-tight tracking-tight sm:text-4xl">
-          ヤクルトレビンズ戸田 vs {lineup.opponent}
-        </h1>
-        <MatchScore
-          levins={lineup.levinsScore}
-          opponent={lineup.opponentScore}
-          levinsName={teamLabel(teams, "ヤクルトレビンズ戸田")}
-          opponentName={teamLabel(teams, lineup.opponent)}
-          levinsLogo={teamLogo(teams, "ヤクルトレビンズ戸田")}
-          opponentLogo={teamLogo(teams, lineup.opponent)}
-        />
-        <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-          <p>
-            {formatDate(lineup.date)}（{day}）
-          </p>
-          <p>{lineup.kickoff} K.O.</p>
-          <p>{lineup.venue}</p>
-        </div>
+        <MatchHeading lineup={lineup} teams={teams} titleAs="h1" />
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           名前をタップすると、その選手の記事一覧へ進みます。下の参照元が、このメンバーの元の投稿です。
         </p>
@@ -199,9 +180,4 @@ function nameAside(shown: string, rosterName?: string, kana?: string): string | 
   if (!alphabet || !/[A-Za-z]/.test(alphabet) || alphabet === shown.trim()) return null;
   if (!/[\u30a0-\u30ff]/.test(shown)) return null;
   return alphabet;
-}
-
-function weekday(iso: string): string {
-  const date = new Date(`${iso}T00:00:00+09:00`);
-  return new Intl.DateTimeFormat("ja-JP", { weekday: "short", timeZone: "Asia/Tokyo" }).format(date);
 }

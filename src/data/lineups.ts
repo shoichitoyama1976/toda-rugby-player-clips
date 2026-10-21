@@ -26,6 +26,8 @@ export type Lineup = {
   /** 終了した試合だけ。未入力は出さない。 */
   levinsScore?: number;
   opponentScore?: number;
+  /** レビンズから見た開催区分。空欄は未記入。 */
+  side?: "" | "ホーム" | "ビジター" | "中立";
   slots: LineupSlot[];
 };
 
