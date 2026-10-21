@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Lineup } from "@/data/lineups";
 import { MatchScore } from "@/components/match-score";
 import { formatDate } from "@/lib/format";
+import { teamLabel } from "@/lib/catalog";
 import { SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
 
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/matches/")({
 });
 
 function MatchesPage() {
-  const { lineups } = useCatalog();
+  const { lineups, teams } = useCatalog();
 
   return (
     <div className="space-y-6">
@@ -50,7 +51,8 @@ function MatchCard({ lineup }: { lineup: Lineup }) {
       <MatchScore
         levins={lineup.levinsScore}
         opponent={lineup.opponentScore}
-        opponentName={lineup.opponent}
+        levinsName={teamLabel(teams, "ヤクルトレビンズ戸田")}
+        opponentName={teamLabel(teams, lineup.opponent)}
       />
       <div className="mt-3 space-y-1 text-sm text-muted-foreground">
         <p>

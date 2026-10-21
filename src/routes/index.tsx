@@ -5,7 +5,7 @@ import { ArticleCard } from "@/components/article-card";
 import { JsonLd } from "@/components/json-ld";
 import { PlayerCard } from "@/components/player-card";
 import { Input } from "@/components/ui/input";
-import { comparePlayers, searchPlayers } from "@/lib/catalog";
+import { comparePlayers, searchPlayers, teamLabel } from "@/lib/catalog";
 import { MatchScore } from "@/components/match-score";
 import { formatDate } from "@/lib/format";
 import { websiteJsonLd } from "@/lib/seo";
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { articles, players, usingSheet, configured, sheetError, countBySlug, origin, lineups } =
+  const { articles, players, usingSheet, configured, sheetError, countBySlug, origin, lineups, teams } =
     useCatalog();
   const [query, setQuery] = useState("");
   const latest = articles.slice(0, 4);
@@ -93,7 +93,8 @@ function Home() {
           <MatchScore
             levins={nextMatch.levinsScore}
             opponent={nextMatch.opponentScore}
-            opponentName={nextMatch.opponent}
+            levinsName={teamLabel(teams, "ヤクルトレビンズ戸田")}
+            opponentName={teamLabel(teams, nextMatch.opponent)}
           />
           <div className="mt-3 space-y-1 text-sm text-muted-foreground">
             <p>

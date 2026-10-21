@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LineupSlot, LineupUnit } from "@/data/lineups";
-import { matchPlayerSlug } from "@/lib/catalog";
+import { matchPlayerSlug, teamLabel } from "@/lib/catalog";
 import { MatchScore } from "@/components/match-score";
 import { formatDate, formatMonthDay } from "@/lib/format";
 import { catalogFromHeadMatches, SITE_NAME } from "@/lib/seo";
@@ -38,7 +38,7 @@ const UNITS: Array<{ id: LineupUnit; label: string; note?: string }> = [
 
 function MatchPage() {
   const { id } = Route.useParams();
-  const { players, countBySlug, lineups } = useCatalog();
+  const { players, countBySlug, lineups, teams } = useCatalog();
   const lineup = lineups.find((item) => item.id === id);
 
   if (!lineup) {
@@ -65,7 +65,8 @@ function MatchPage() {
         <MatchScore
           levins={lineup.levinsScore}
           opponent={lineup.opponentScore}
-          opponentName={lineup.opponent}
+          levinsName={teamLabel(teams, "ヤクルトレビンズ戸田")}
+          opponentName={teamLabel(teams, lineup.opponent)}
         />
         <div className="mt-3 space-y-1 text-sm text-muted-foreground">
           <p>

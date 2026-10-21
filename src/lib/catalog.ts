@@ -412,6 +412,52 @@ export function matchSheet(csv: string | null | undefined): Record<string, Sheet
   return matches;
 }
 
+export type SheetTeam = {
+  official: string;
+  short: string;
+  team: string;
+  region: string;
+  aliases: string[];
+};
+
+function splitAliases(value: string): string[] {
+  return value
+    .split(/[、,，/／]/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+export function teamSheet(csv: string | null | undefined): SheetTeam[] {
+  if (!csv?.trim()) return [];
+  const rows = parseDelimited(csv);
+  if (rows.length < 2) return [];
+  const index = headerIndex(rows[0]);
+  const teams: SheetTeam[] = [];
+  for (const row of rows.slice(1)) {
+    const official = pick(row, index, ["正式名称"]);
+    const team = pick(row, index, ["チーム名"]);
+    const short = pick(row, index, ["短縮名"]);
+    if (!official && !team && !short) continue;
+    teams.push({
+      official,
+      short,
+      team,
+      region: pick(row, index, ["地域名", "地域"]),
+      aliases: splitAliases(pick(row, index, ["その他の呼び名"])),
+    });
+  }
+  return teams;
+}
+
+export function teamLabel(teams: readonly SheetTeam[], raw: string): string {
+  const name = raw.trim();
+  if (!name) return name;
+  const hit = teams.find((team) =>
+    [team.official, team.short, team.team, ...team.aliases].includes(name),
+  );
+  return hit?.team || hit?.short || name;
+}
+
 export function matchPostUrls(csv: string | null | undefined): Record<string, string> {
   const urls: Record<string, string> = {};
   for (const [id, match] of Object.entries(matchSheet(csv))) {
