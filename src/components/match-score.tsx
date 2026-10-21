@@ -27,18 +27,20 @@ export function MatchScore({
       ) : (
         <span className="text-muted-foreground">–</span>
       )}
-      <TeamFace name={opponentName} logo={opponentLogo} />
+      <TeamFace name={opponentName} logo={opponentLogo} logoAfter />
     </p>
   );
 }
 
-function TeamFace({ name, logo }: { name: string; logo?: string }) {
+function TeamFace({ name, logo, logoAfter }: { name: string; logo?: string; logoAfter?: boolean }) {
+  const mark = logo ? (
+    <img src={logo} alt="" width={32} height={32} className="size-8 object-contain" />
+  ) : null;
   return (
     <span className="inline-flex items-center gap-1.5">
-      {logo ? (
-        <img src={logo} alt="" width={32} height={32} className="size-8 object-contain" />
-      ) : null}
+      {logoAfter ? null : mark}
       <span className="text-sm text-muted-foreground">{name}</span>
+      {logoAfter ? mark : null}
     </span>
   );
 }
