@@ -418,6 +418,7 @@ export type SheetTeam = {
   team: string;
   region: string;
   aliases: string[];
+  logo: string;
 };
 
 function splitAliases(value: string): string[] {
@@ -444,19 +445,26 @@ export function teamSheet(csv: string | null | undefined): SheetTeam[] {
       team,
       region: pick(row, index, ["地域名", "地域"]),
       aliases: splitAliases(pick(row, index, ["その他の呼び名"])),
+      logo: pick(row, index, ["Logo", "ロゴ", "logo"]),
     });
   }
   return teams;
 }
 
 export function teamLabel(teams: readonly SheetTeam[], raw: string): string {
+  const hit = findTeam(teams, raw);
+  if (!hit) return raw.trim();
+  return hit.team || hit.short || raw.trim();
+}
+
+export function teamLogo(teams: readonly SheetTeam[], raw: string): string {
+  return findTeam(teams, raw)?.logo ?? "";
+}
+
+function findTeam(teams: readonly SheetTeam[], raw: string): SheetTeam | undefined {
   const name = raw.trim();
-  if (!name) return name;
-  const hit = teams.find((team) =>
-    [team.official, team.short, team.team, ...team.aliases].includes(name),
-  );
-  if (!hit) return name;
-  return hit.team || hit.short || name;
+  if (!name) return undefined;
+  return teams.find((team) => [team.official, team.short, team.team, ...team.aliases].includes(name));
 }
 
 export type SheetEvent = {

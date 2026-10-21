@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Lineup } from "@/data/lineups";
 import { MatchScore } from "@/components/match-score";
 import { formatDate } from "@/lib/format";
-import { teamLabel, type SheetTeam } from "@/lib/catalog";
+import { teamLabel, teamLogo, type SheetTeam } from "@/lib/catalog";
 import { SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
 
@@ -53,6 +53,8 @@ function MatchCard({ lineup, teams }: { lineup: Lineup; teams: readonly SheetTea
         opponent={lineup.opponentScore}
         levinsName={teamLabel(teams, "ヤクルトレビンズ戸田")}
         opponentName={teamLabel(teams, lineup.opponent)}
+        levinsLogo={teamLogo(teams, "ヤクルトレビンズ戸田")}
+        opponentLogo={teamLogo(teams, lineup.opponent)}
       />
       <div className="mt-3 space-y-1 text-sm text-muted-foreground">
         <p>

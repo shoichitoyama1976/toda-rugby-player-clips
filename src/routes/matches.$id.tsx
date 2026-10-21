@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LineupSlot, LineupUnit } from "@/data/lineups";
-import { matchPlayerSlug, teamLabel } from "@/lib/catalog";
+import { matchPlayerSlug, teamLabel, teamLogo } from "@/lib/catalog";
 import { MatchScore } from "@/components/match-score";
 import { formatDate, formatMonthDay } from "@/lib/format";
 import { catalogFromHeadMatches, SITE_NAME } from "@/lib/seo";
@@ -67,6 +67,8 @@ function MatchPage() {
           opponent={lineup.opponentScore}
           levinsName={teamLabel(teams, "ヤクルトレビンズ戸田")}
           opponentName={teamLabel(teams, lineup.opponent)}
+          levinsLogo={teamLogo(teams, "ヤクルトレビンズ戸田")}
+          opponentLogo={teamLogo(teams, lineup.opponent)}
         />
         <div className="mt-3 space-y-1 text-sm text-muted-foreground">
           <p>

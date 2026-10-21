@@ -5,7 +5,7 @@ import { ArticleCard } from "@/components/article-card";
 import { JsonLd } from "@/components/json-ld";
 import { PlayerCard } from "@/components/player-card";
 import { Input } from "@/components/ui/input";
-import { comparePlayers, searchPlayers, teamLabel } from "@/lib/catalog";
+import { comparePlayers, searchPlayers, teamLabel, teamLogo } from "@/lib/catalog";
 import { MatchScore } from "@/components/match-score";
 import { formatDate } from "@/lib/format";
 import { websiteJsonLd } from "@/lib/seo";
@@ -142,6 +142,8 @@ function Home() {
             opponent={upcomingMatch.opponentScore}
             levinsName={teamLabel(teams, "ヤクルトレビンズ戸田")}
             opponentName={teamLabel(teams, upcomingMatch.opponent)}
+            levinsLogo={teamLogo(teams, "ヤクルトレビンズ戸田")}
+            opponentLogo={teamLogo(teams, upcomingMatch.opponent)}
           />
           <div className="mt-3 space-y-1 text-sm text-muted-foreground">
             <p>
