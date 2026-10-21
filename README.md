@@ -43,7 +43,7 @@ Grok の `grok.me` は、作っている途中を見るためのものです。�
 | `src/data/players.csv` | 選手、スタッフ、ホームタウン |
 | `src/data/clips.csv` | 掲載記事 |
 | `src/data/matches.csv` | 試合。終了した試合は「レビンズ得点」「相手得点」に数字だけを入れる |
-| `src/data/teams.csv` | チーム名。得点の横には、短縮名とチーム名のうち一番短い方を出す |
+| `src/data/teams.csv` | チーム名。得点の横には「チーム名」を出す |
 | `src/data/lineups.csv` | 出場メンバー |
 | `src/data/links.csv` | リンク集。グループの値ごとに分けて出します。その他はサイト名だけです |
 
