@@ -32,9 +32,27 @@ function Home() {
   const latest = articles.slice(0, 4);
   const sources = new Set(articles.map((a) => a.sourceLabel)).size;
   const siteLd = websiteJsonLd(origin);
-  const nextMatch = lineups[0];
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Tokyo" }).format(new Date());
-  const nextEvent = events.find((event) => event.date >= today) ?? null;
+  const horizon = addDays(today, 6);
+  const upcomingMatch =
+    lineups
+      .filter((lineup) => lineup.date >= today && lineup.date <= horizon)
+      .sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
+  const laterMatch =
+    lineups
+      .filter((lineup) => lineup.date > horizon)
+      .sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
+  const lastMatch = lineups.find((lineup) => lineup.date < today) ?? null;
+  const nextEvent =
+    events.find((event) => event.date >= today && event.date <= horizon) ?? null;
+  const recentMatch = lastMatch ? addDays(lastMatch.date, 21) >= today : false;
+  const homeNote = upcomingMatch
+    ? null
+    : nextEvent
+      ? "event"
+      : laterMatch || recentMatch
+        ? "bye"
+        : "off";
 
   const roster = useMemo(() => {
     return [...searchPlayers(players, query)].sort(comparePlayers);
@@ -50,12 +68,12 @@ function Home() {
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
           レビンズの試合の行き帰りに、今日出る選手の名前を入れて開いてください。掲載記事へ案内します。本文は転載していません。
-          {nextMatch ? (
+          {upcomingMatch ? (
             <>
               直近の試合の出場選手から探したい場合は、すぐ下の
               <Link
                 to="/matches/$id"
-                params={{ id: nextMatch.id }}
+                params={{ id: upcomingMatch.id }}
                 className="mx-1 text-accent hover:text-foreground"
               >
                 【出場メンバーを見る】
@@ -84,41 +102,54 @@ function Home() {
         )}
       </section>
 
-      {nextEvent ? (
-        <Link
-          to="/events"
-          className="block rounded-[var(--radius-xl)] bg-card p-5 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
-        >
-          <p className="text-[11px] tracking-[0.18em] text-accent">イベント</p>
-          <p className="mt-2 font-display text-2xl leading-tight">{nextEvent.name}</p>
-          <p className="mt-3 text-sm text-muted-foreground">{formatDate(nextEvent.date)}</p>
-          {nextEvent.summary ? (
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{nextEvent.summary}</p>
-          ) : null}
-        </Link>
+      {homeNote === "event" && nextEvent ? (
+        <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
+          {nextEvent.url ? (
+            <a
+              href={nextEvent.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-accent hover:text-foreground"
+            >
+              公式X
+            </a>
+          ) : (
+            "公式X"
+          )}
+          でイベント情報が出ています。{nextEvent.summary}
+        </p>
+      ) : null}
+      {homeNote === "bye" ? (
+        <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
+          今週は試合がありません。
+          {laterMatch ? `次の試合は${formatDate(laterMatch.date)}です。` : ""}
+        </p>
+      ) : null}
+      {homeNote === "off" ? (
+        <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">オフシーズンです。</p>
       ) : null}
 
-      {nextMatch ? (
+      {upcomingMatch ? (
         <Link
           to="/matches/$id"
-          params={{ id: nextMatch.id }}
+          params={{ id: upcomingMatch.id }}
           className="block rounded-[var(--radius-xl)] bg-card p-5 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
         >
           <p className="text-[11px] tracking-[0.18em] text-accent">試合メンバーから記事へ</p>
-          <p className="mt-2 font-display text-2xl leading-tight">vs {nextMatch.opponent}</p>
+          <p className="mt-2 font-display text-2xl leading-tight">vs {upcomingMatch.opponent}</p>
           <MatchScore
-            levins={nextMatch.levinsScore}
-            opponent={nextMatch.opponentScore}
+            levins={upcomingMatch.levinsScore}
+            opponent={upcomingMatch.opponentScore}
             levinsName={teamLabel(teams, "ヤクルトレビンズ戸田")}
-            opponentName={teamLabel(teams, nextMatch.opponent)}
+            opponentName={teamLabel(teams, upcomingMatch.opponent)}
           />
           <div className="mt-3 space-y-1 text-sm text-muted-foreground">
             <p>
-              {formatDate(nextMatch.date)}
-              {nextMatch.weekday ? `（${nextMatch.weekday}）` : ""}
+              {formatDate(upcomingMatch.date)}
+              {upcomingMatch.weekday ? `（${upcomingMatch.weekday}）` : ""}
             </p>
-            <p>{nextMatch.kickoff} K.O.</p>
-            <p>{nextMatch.venue}</p>
+            <p>{upcomingMatch.kickoff} K.O.</p>
+            <p>{upcomingMatch.venue}</p>
           </div>
           <p className="mt-3 inline-flex items-center gap-1 text-sm text-foreground">
             出場メンバーを見る
@@ -161,6 +192,12 @@ function Home() {
       </section>
     </div>
   );
+}
+
+function addDays(iso: string, days: number): string {
+  const [year, month, day] = iso.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + days));
+  return date.toISOString().slice(0, 10);
 }
 
 function Stat({
