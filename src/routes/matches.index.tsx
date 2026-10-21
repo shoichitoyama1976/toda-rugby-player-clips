@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Lineup } from "@/data/lineups";
 import { MatchScore } from "@/components/match-score";
 import { formatDate } from "@/lib/format";
-import { teamLabel } from "@/lib/catalog";
+import { teamLabel, type SheetTeam } from "@/lib/catalog";
 import { SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
 
@@ -32,14 +32,14 @@ function MatchesPage() {
       </header>
       <div className="grid gap-3">
         {lineups.map((lineup) => (
-          <MatchCard key={lineup.id} lineup={lineup} />
+          <MatchCard key={lineup.id} lineup={lineup} teams={teams} />
         ))}
       </div>
     </div>
   );
 }
 
-function MatchCard({ lineup }: { lineup: Lineup }) {
+function MatchCard({ lineup, teams }: { lineup: Lineup; teams: readonly SheetTeam[] }) {
   return (
     <Link
       to="/matches/$id"
