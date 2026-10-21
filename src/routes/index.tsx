@@ -6,7 +6,7 @@ import { JsonLd } from "@/components/json-ld";
 import { PlayerCard } from "@/components/player-card";
 import { Input } from "@/components/ui/input";
 import { comparePlayers, searchPlayers } from "@/lib/catalog";
-import { MatchHeading } from "@/components/match-heading";
+import { MatchHeading, ReportLink } from "@/components/match-heading";
 import { formatDate } from "@/lib/format";
 import { websiteJsonLd } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
@@ -130,17 +130,20 @@ function Home() {
       ) : null}
 
       {upcomingMatch ? (
-        <Link
-          to="/matches/$id"
-          params={{ id: upcomingMatch.id }}
-          className="block rounded-[var(--radius-xl)] bg-card p-5 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
-        >
-          <MatchHeading lineup={upcomingMatch} teams={teams} />
-          <p className="mt-3 inline-flex items-center gap-1 text-sm text-foreground">
-            出場メンバーを見る
-            <ArrowRight className="size-3.5" />
-          </p>
-        </Link>
+        <div className="rounded-[var(--radius-xl)] bg-card shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]">
+          <Link to="/matches/$id" params={{ id: upcomingMatch.id }} className="block p-5">
+            <MatchHeading lineup={upcomingMatch} teams={teams} />
+            <p className="mt-3 inline-flex items-center gap-1 text-sm text-foreground">
+              出場メンバーを見る
+              <ArrowRight className="size-3.5" />
+            </p>
+          </Link>
+          {upcomingMatch.reportUrl ? (
+            <div className="px-5 pb-5">
+              <ReportLink href={upcomingMatch.reportUrl} />
+            </div>
+          ) : null}
+        </div>
       ) : null}
 
       <section className="grid grid-cols-3 gap-3">

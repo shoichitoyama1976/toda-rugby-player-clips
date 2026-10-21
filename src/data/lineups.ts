@@ -28,6 +28,8 @@ export type Lineup = {
   opponentScore?: number;
   /** レビンズから見た開催区分。空欄は未記入。 */
   side?: "" | "ホーム" | "ビジター" | "中立";
+  /** リーグワン公式の試合レポート。公式戦だけで、空なら出さない。 */
+  reportUrl?: string;
   slots: LineupSlot[];
 };
 

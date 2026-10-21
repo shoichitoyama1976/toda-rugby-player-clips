@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LineupSlot, LineupUnit } from "@/data/lineups";
 import { matchPlayerSlug } from "@/lib/catalog";
-import { MatchHeading } from "@/components/match-heading";
+import { MatchHeading, ReportLink } from "@/components/match-heading";
 import { formatMonthDay } from "@/lib/format";
 import { catalogFromHeadMatches, SITE_NAME } from "@/lib/seo";
 import { useCatalog } from "@/lib/use-catalog";
@@ -58,6 +58,11 @@ function MatchPage() {
     <div className="space-y-6">
       <header className="max-w-2xl">
         <MatchHeading lineup={lineup} teams={teams} titleAs="h1" />
+        {lineup.reportUrl ? (
+          <p className="mt-3">
+            <ReportLink href={lineup.reportUrl} />
+          </p>
+        ) : null}
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           名前をタップすると、その選手の記事一覧へ進みます。下の参照元が、このメンバーの元の投稿です。
         </p>

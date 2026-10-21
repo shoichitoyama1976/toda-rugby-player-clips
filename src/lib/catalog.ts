@@ -360,6 +360,7 @@ export type SheetMatch = {
   levinsScore?: number;
   opponentScore?: number;
   side: "" | "ホーム" | "ビジター" | "中立";
+  reportUrl: string;
 };
 
 function sheetDate(value: string): string {
@@ -415,6 +416,7 @@ export function matchSheet(csv: string | null | undefined): Record<string, Sheet
       levinsScore: scoreNumber(pick(row, index, ["レビンズ得点"])),
       opponentScore: scoreNumber(pick(row, index, ["相手得点"])),
       side: matchSide(pick(row, index, ["ホームビジター", "ホーム／ビジター"])),
+      reportUrl: httpUrl(pick(row, index, ["リーグワン公式試合レポート"])) ?? "",
     };
   }
   return matches;
@@ -556,6 +558,7 @@ export function buildSheetLineups(
         levinsScore: meta?.levinsScore,
         opponentScore: meta?.opponentScore,
         side: meta?.side || "",
+        reportUrl: meta?.reportUrl || "",
         slots: [],
       };
       byId.set(id, lineup);
@@ -576,6 +579,18 @@ export function buildSheetLineups(
     lineup.slots.push(slot);
   }
   return [...byId.values()].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+}
+
+function httpUrl(value: string): string | null {
+  const raw = value.trim();
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
 }
 
 function xPostUrl(value: string): string | null {

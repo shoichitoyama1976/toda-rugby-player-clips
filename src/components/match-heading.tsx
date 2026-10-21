@@ -46,3 +46,17 @@ function weekday(iso: string): string {
   const date = new Date(`${iso}T00:00:00+09:00`);
   return new Intl.DateTimeFormat("ja-JP", { weekday: "short", timeZone: "Asia/Tokyo" }).format(date);
 }
+
+export function ReportLink({ href }: { href?: string }) {
+  if (!href) return null;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex min-h-11 items-center text-sm text-accent hover:text-foreground"
+    >
+      リーグワン公式の試合レポートを開く
+    </a>
+  );
+}
