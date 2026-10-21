@@ -20,9 +20,13 @@ export function MatchScore({
       <TeamFace name={levinsName} logo={levinsLogo} />
       {scored ? (
         <>
-          <span className="font-display text-3xl tabular-nums leading-none tracking-tight">{levins}</span>
+          <span className="font-display text-4xl font-medium tabular-nums leading-none tracking-tight text-accent">
+            {levins}
+          </span>
           <span className="text-muted-foreground">–</span>
-          <span className="font-display text-3xl tabular-nums leading-none tracking-tight">{opponent}</span>
+          <span className="font-display text-4xl font-medium tabular-nums leading-none tracking-tight text-accent">
+            {opponent}
+          </span>
         </>
       ) : (
         <span className="text-muted-foreground">–</span>
@@ -39,7 +43,7 @@ function TeamFace({ name, logo, logoAfter }: { name: string; logo?: string; logo
   return (
     <span className="inline-flex items-center gap-1.5">
       {logoAfter ? null : mark}
-      <span className="text-sm text-muted-foreground">{name}</span>
+      <span className="text-sm text-foreground">{name}</span>
       {logoAfter ? mark : null}
     </span>
   );
