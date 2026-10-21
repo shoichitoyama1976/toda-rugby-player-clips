@@ -455,7 +455,10 @@ export function teamLabel(teams: readonly SheetTeam[], raw: string): string {
   const hit = teams.find((team) =>
     [team.official, team.short, team.team, ...team.aliases].includes(name),
   );
-  return hit?.team || hit?.short || name;
+  if (!hit) return name;
+  const candidates = [hit.short, hit.team, ...hit.aliases].map((value) => value.trim()).filter(Boolean);
+  if (candidates.length === 0) return hit.official || name;
+  return candidates.reduce((shortest, value) => (value.length < shortest.length ? value : shortest));
 }
 
 export function matchPostUrls(csv: string | null | undefined): Record<string, string> {
