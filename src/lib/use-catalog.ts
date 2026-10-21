@@ -1,9 +1,16 @@
 import { useLoaderData } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { LINEUPS } from "@/data/lineups";
-import { LINEUPS_CSV, MATCHES_CSV, TEAMS_CSV } from "@/data/sheet-archive";
+import { EVENTS_CSV, LINEUPS_CSV, MATCHES_CSV, TEAMS_CSV } from "@/data/sheet-archive";
 import { SHEET_CACHE_MS } from "@/data/sheet-config";
-import { articlesForPlayer, buildSheetLineups, matchSheet, resolveCatalog, teamSheet } from "./catalog";
+import {
+  articlesForPlayer,
+  buildSheetLineups,
+  eventSheet,
+  matchSheet,
+  resolveCatalog,
+  teamSheet,
+} from "./catalog";
 
 function dataRows(csv: string | null | undefined): number {
   if (!csv?.trim()) return 0;
@@ -37,6 +44,7 @@ export function useCatalog() {
       matchSheet: matches,
       lineups: lineups.length > 0 ? lineups : LINEUPS,
       teams: teamSheet(TEAMS_CSV),
+      events: eventSheet(EVENTS_CSV),
       configured: sheet.configured,
       sheetError: sheet.ok ? null : sheet.error,
       fetchedAt: "fetchedAt" in sheet ? (sheet.fetchedAt ?? null) : null,

@@ -12,6 +12,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const urls = [
           `${origin}/`,
           `${origin}/matches`,
+          `${origin}/events`,
           `${origin}/players`,
           `${origin}/articles`,
           `${origin}/sources`,

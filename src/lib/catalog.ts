@@ -459,6 +459,42 @@ export function teamLabel(teams: readonly SheetTeam[], raw: string): string {
   return hit.team || hit.short || name;
 }
 
+export type SheetEvent = {
+  id: string;
+  date: string;
+  name: string;
+  url: string;
+  summary: string;
+};
+
+function eventDate(value: string): string {
+  const match = value.trim().match(/^(\d{4})[./-](\d{1,2})[./-](\d{1,2})/);
+  if (!match) return value.trim();
+  return `${match[1]}-${match[2].padStart(2, "0")}-${match[3].padStart(2, "0")}`;
+}
+
+export function eventSheet(csv: string | null | undefined): SheetEvent[] {
+  if (!csv?.trim()) return [];
+  const rows = parseDelimited(csv);
+  if (rows.length < 2) return [];
+  const index = headerIndex(rows[0]);
+  const events: SheetEvent[] = [];
+  for (const row of rows.slice(1)) {
+    const name = pick(row, index, ["イベント名"]);
+    const date = eventDate(pick(row, index, ["日付"]));
+    if (!name || !date) continue;
+    const url = pick(row, index, ["公式告知URL", "URL"]);
+    events.push({
+      id: pick(row, index, ["ID"]) || date,
+      date,
+      name,
+      url: /^https?:\/\//i.test(url) ? url : "",
+      summary: pick(row, index, ["イベント概要", "概要"]),
+    });
+  }
+  return events.sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+}
+
 export function matchPostUrls(csv: string | null | undefined): Record<string, string> {
   const urls: Record<string, string> = {};
   for (const [id, match] of Object.entries(matchSheet(csv))) {

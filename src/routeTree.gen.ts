@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CorrectionsRouteImport } from './routes/corrections'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
@@ -39,6 +40,11 @@ const AboutRoute = AboutRouteImport.update({
 const CorrectionsRoute = CorrectionsRouteImport.update({
   id: '/corrections',
   path: '/corrections',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InboxRoute = InboxRouteImport.update({
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/corrections': typeof CorrectionsRoute
+  '/events': typeof EventsRoute
   '/inbox': typeof InboxRoute
   '/links': typeof LinksRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/corrections': typeof CorrectionsRoute
+  '/events': typeof EventsRoute
   '/inbox': typeof InboxRoute
   '/links': typeof LinksRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/corrections': typeof CorrectionsRoute
+  '/events': typeof EventsRoute
   '/inbox': typeof InboxRoute
   '/links': typeof LinksRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/corrections'
+    | '/events'
     | '/inbox'
     | '/links'
     | '/robots.txt'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/corrections'
+    | '/events'
     | '/inbox'
     | '/links'
     | '/robots.txt'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/corrections'
+    | '/events'
     | '/inbox'
     | '/links'
     | '/robots.txt'
@@ -223,6 +235,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   CorrectionsRoute: typeof CorrectionsRoute
+  EventsRoute: typeof EventsRoute
   InboxRoute: typeof InboxRoute
   LinksRoute: typeof LinksRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/corrections'
       fullPath: '/corrections'
       preLoaderRoute: typeof CorrectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inbox': {
@@ -359,6 +379,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   CorrectionsRoute: CorrectionsRoute,
+  EventsRoute: EventsRoute,
   InboxRoute: InboxRoute,
   LinksRoute: LinksRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,

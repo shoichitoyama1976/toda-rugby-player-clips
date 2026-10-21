@@ -26,13 +26,15 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { articles, players, usingSheet, configured, sheetError, countBySlug, origin, lineups, teams } =
+  const { articles, players, usingSheet, configured, sheetError, countBySlug, origin, lineups, teams, events } =
     useCatalog();
   const [query, setQuery] = useState("");
   const latest = articles.slice(0, 4);
   const sources = new Set(articles.map((a) => a.sourceLabel)).size;
   const siteLd = websiteJsonLd(origin);
   const nextMatch = lineups[0];
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Tokyo" }).format(new Date());
+  const nextEvent = events.find((event) => event.date >= today) ?? null;
 
   const roster = useMemo(() => {
     return [...searchPlayers(players, query)].sort(comparePlayers);
@@ -81,6 +83,20 @@ function Home() {
           </p>
         )}
       </section>
+
+      {nextEvent ? (
+        <Link
+          to="/events"
+          className="block rounded-[var(--radius-xl)] bg-card p-5 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 hover:shadow-[var(--shadow-border-hover)]"
+        >
+          <p className="text-[11px] tracking-[0.18em] text-accent">イベント</p>
+          <p className="mt-2 font-display text-2xl leading-tight">{nextEvent.name}</p>
+          <p className="mt-3 text-sm text-muted-foreground">{formatDate(nextEvent.date)}</p>
+          {nextEvent.summary ? (
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{nextEvent.summary}</p>
+          ) : null}
+        </Link>
+      ) : null}
 
       {nextMatch ? (
         <Link
