@@ -34,8 +34,11 @@ function CorrectionsPage() {
     () => players.filter((player) => !player.unlisted).sort((a, b) => a.name.localeCompare(b.name, "ja")),
     [players],
   );
+  const presetPlayer = roster.find(
+    (player) => player.slug === preset || player.legacySlugs?.includes(preset ?? ""),
+  );
 
-  const [slug, setSlug] = useState(preset ?? "");
+  const [slug, setSlug] = useState(presetPlayer?.slug ?? "");
   const [fieldKey, setFieldKey] = useState<ProfileFieldKey>("position");
   const [proposed, setProposed] = useState("");
   const [note, setNote] = useState("");

@@ -896,6 +896,7 @@ function withPersonSlug(player: Player): Player {
     const numbered = `p-${normId(player.sheetId)}`;
     if (numbered !== next) legacy.add(numbered);
   }
+  if (normId(player.sheetId ?? "") === "75") legacy.add("kimu-hiroyasu");
   const reversed = legacyLatinSlug(player.name);
   if (reversed && reversed !== next) legacy.add(reversed);
   legacy.delete(next);

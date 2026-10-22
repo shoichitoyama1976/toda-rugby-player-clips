@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArticleCard } from "@/components/article-card";
 import { MediaMark, dominantMediaKind } from "@/components/media-mark";
@@ -8,8 +8,6 @@ import { searchArticles } from "@/lib/catalog";
 import { useCatalog } from "@/lib/use-catalog";
 import { cn } from "@/lib/utils";
 
-type Search = { media?: string };
-
 const MEDIA_GROUPS = [
   { id: "official-hp", label: "公式HP" },
   { id: "official-note", label: "公式note" },
@@ -17,7 +15,11 @@ const MEDIA_GROUPS = [
   { id: "other", label: "その他" },
 ] as const;
 
+const GROUP_IDS = new Set<string>(MEDIA_GROUPS.map((item) => item.id));
+
 type MediaGroup = (typeof MEDIA_GROUPS)[number]["id"];
+
+type Search = { media?: string; group?: MediaGroup };
 
 function mediaGroup(article: Article): MediaGroup {
   const label = article.sourceLabel.trim();
@@ -38,16 +40,24 @@ function mediaGroup(article: Article): MediaGroup {
 export const Route = createFileRoute("/articles/")({
   validateSearch: (search: Record<string, unknown>): Search => ({
     media: typeof search.media === "string" && search.media.trim() ? search.media : undefined,
+    group: typeof search.group === "string" && GROUP_IDS.has(search.group) ? (search.group as MediaGroup) : undefined,
   }),
   component: ArticlesPage,
 });
 
 function ArticlesPage() {
-  const { media } = Route.useSearch();
+  const { media, group: groupSearch } = Route.useSearch();
+  const navigate = useNavigate();
   const { articles } = useCatalog();
   const [query, setQuery] = useState("");
-  const [group, setGroup] = useState<MediaGroup | "all">("all");
+  const group = groupSearch ?? "all";
   const [kind, setKind] = useState<ArticleKind | "all">("all");
+
+  if (media) {
+    const sample = articles.find((article) => article.sourceLabel.trim() === media.trim());
+    const next = sample ? mediaGroup(sample) : undefined;
+    return <Navigate to="/articles" search={next ? { group: next } : {}} replace />;
+  }
 
   const mediaKind = useMemo(() => {
     if (!media) return null;
@@ -95,7 +105,13 @@ function ArticlesPage() {
         <>
           <FilterRow
             value={group}
-            onChange={setGroup}
+            onChange={(value) => {
+              void navigate({
+                to: "/articles",
+                search: value === "all" ? {} : { group: value },
+                replace: true,
+              });
+            }}
             options={MEDIA_GROUPS.map((item) => ({ value: item.id, label: item.label }))}
           />
           <FilterRow
