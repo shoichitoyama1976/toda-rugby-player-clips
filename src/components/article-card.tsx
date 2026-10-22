@@ -52,10 +52,14 @@ export function ArticleCard({
       </h3>
 
       {youtube || broken ? (
-        <p className="mt-2 flex flex-wrap gap-2">
-          {youtube ? <Badge>YouTube 音あり注意</Badge> : null}
-          {broken ? <Badge>リンク切れ</Badge> : null}
-        </p>
+        <div className="mt-2 space-y-2">
+          {youtube ? (
+            <p>
+              <Badge>YouTube 音あり注意</Badge>
+            </p>
+          ) : null}
+          {broken ? <p className="text-sm text-foreground">この原文はリンク切れです。</p> : null}
+        </div>
       ) : null}
 
       <div className="mt-3 flex items-center justify-between gap-2">

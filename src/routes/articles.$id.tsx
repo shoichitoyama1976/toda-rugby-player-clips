@@ -65,7 +65,6 @@ function ArticlePage() {
           </time>
           <Badge>{article.sourceLabel}</Badge>
           {youtube ? <Badge>YouTube 音あり注意</Badge> : null}
-          {isBrokenArticleUrl(article.url) ? <Badge>リンク切れ</Badge> : null}
           <Badge tone="accent">{KIND_LABEL[article.kind]}</Badge>
           {article.season ? <Badge>{article.season}</Badge> : null}
         </div>
@@ -74,6 +73,11 @@ function ArticlePage() {
         </h1>
         {article.excerpt ? (
           <p className="text-sm leading-relaxed text-muted-foreground">{article.excerpt}</p>
+        ) : null}
+        {isBrokenArticleUrl(article.url) ? (
+          <p className="text-sm text-foreground">
+            この原文はリンク切れです。ページが削除されたか、アドレスが変わっています。
+          </p>
         ) : null}
         <div className="flex flex-wrap gap-2">
           {/^https?:\/\//i.test(article.url) ? (
