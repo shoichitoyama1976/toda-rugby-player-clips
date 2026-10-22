@@ -1,7 +1,5 @@
-/** 404 または 410 だけを入れる。到達できないだけのサイトは入れない。2026-10-22 の確認。 */
-export const BROKEN_ARTICLE_URLS: string[] = [
-  "https://www.bravelupus.com/exclusive/story_91/",
-];
+/** 記事そのものが 404 または 410 のときだけ入れる。サイト全体のメンテナンスは入れない。2026-10-22 の確認では該当なし。 */
+export const BROKEN_ARTICLE_URLS: string[] = [];
 
 function linkKey(url: string): string {
   try {
