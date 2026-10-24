@@ -18,6 +18,8 @@ export const Route = createFileRoute("/events")({
 
 function EventsPage() {
   const { events } = useCatalog();
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Tokyo" }).format(new Date());
+  const upcoming = events.filter((event) => event.date >= today);
 
   return (
     <div className="space-y-6">
@@ -27,13 +29,13 @@ function EventsPage() {
           試合のない週の予定です。公式の告知は、元の投稿を開いて確認してください。
         </p>
       </header>
-      {events.length === 0 ? (
+      {upcoming.length === 0 ? (
         <p className="rounded-[var(--radius-md)] bg-muted px-4 py-8 text-center text-sm text-muted-foreground">
           まだありません。
         </p>
       ) : (
         <div className="grid gap-3">
-          {events.map((event) => (
+          {upcoming.map((event) => (
             <article
               key={event.id}
               className="rounded-[var(--radius-lg)] bg-card p-4 shadow-[var(--shadow-border)]"
