@@ -356,9 +356,9 @@ export const PLAYERS: Player[] = [
   },
   {
     slug: "sota-saito",
-    name: "斎藤颯太",
-    nameKana: "サイトウ ソウタ",
-    aliases: ["斎藤 颯太", "斉藤颯太", "Sota Saito"],
+    name: "齋藤 聡汰",
+    nameKana: "さいとう そうた",
+    aliases: ["齋藤 聡汰", "斎藤颯太", "斎藤 颯太", "斉藤颯太", "Sota Saito"],
     position: "SO",
     status: "current",
   },
