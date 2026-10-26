@@ -441,9 +441,10 @@ export const PLAYERS: Player[] = [
   },
   {
     slug: "takahashi",
-    name: "高橋拓也",
-    nameKana: "タカハシ タクヤ",
-    aliases: ["高橋 拓也", "Takuya Takahashi"],
+    name: "髙橋 拓行",
+    nameKana: "たかはし たくや",
+    aliases: ["髙橋 拓行", "高橋拓行", "高橋 拓行", "高橋拓也", "高橋 拓也", "Takuya Takahashi"],
+    legacySlugs: ["takahashi-takuya-17"],
     position: "WTB",
     status: "current",
   },
