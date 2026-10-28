@@ -129,7 +129,9 @@ function SlotRow({
     (slot.playerId ? players.find((item) => item.sheetId === slot.playerId) : undefined) ??
     (slug ? players.find((item) => item.slug === slug) : undefined);
   const count = player ? (countBySlug.get(player.slug) ?? 0) : 0;
-  const reading = nameAside(slot.name, player?.name, player?.nameKana);
+  const label = player?.name || slot.name;
+  const reading = player?.nameKana?.trim();
+  const aside = reading && reading !== label ? reading : "";
   const position = slot.position?.trim() || player?.position || "";
   const className = cn(
     "flex min-h-14 items-center gap-3 rounded-[var(--radius-lg)] bg-card px-3 py-2 shadow-[var(--shadow-border)]",
@@ -145,9 +147,9 @@ function SlotRow({
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-base leading-snug">
-          {slot.name}
+          {label}
           {slot.captain ? <span className="text-accent">（C）</span> : null}
-          {reading ? <span className="text-muted-foreground"> （{reading}）</span> : null}
+          {aside ? <span className="text-muted-foreground"> （{aside}）</span> : null}
         </span>
         {slot.shirt ? (
           <span className="text-[11px] text-muted-foreground">着番号 {slot.shirt}</span>
@@ -174,15 +176,4 @@ function SlotRow({
       {body}
     </Link>
   );
-}
-
-function nameAside(shown: string, rosterName?: string, kana?: string): string | null {
-  const reading = kana?.trim();
-  if (/[\u3400-\u9fff]/.test(shown)) return reading || null;
-  if (/[A-Za-z]/.test(shown) && reading && !/[A-Za-z]/.test(reading)) return reading;
-  if (reading && /[A-Za-z]/.test(reading) && /[\u30a0-\u30ff]/.test(shown)) return reading;
-  const alphabet = rosterName?.trim();
-  if (!alphabet || !/[A-Za-z]/.test(alphabet) || alphabet === shown.trim()) return null;
-  if (!/[\u30a0-\u30ff]/.test(shown)) return null;
-  return alphabet;
 }
