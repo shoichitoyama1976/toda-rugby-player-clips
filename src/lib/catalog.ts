@@ -571,7 +571,7 @@ export function buildSheetLineups(
       unit,
       number: unit === "R" ? (shirt ?? squadNumber ?? 0) : (squadNumber ?? shirt ?? 0),
       name,
-      shirt: unit === "R" ? undefined : shirt,
+      shirt,
       playerId: pick(row, index, ["PlayerID"]) || undefined,
       captain: Boolean(pick(row, index, ["キャプテン"])),
       position: pick(row, index, ["ポジション"]) || undefined,

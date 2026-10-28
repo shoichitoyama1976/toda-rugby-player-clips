@@ -5,7 +5,7 @@ export type LineupSlot = {
   /** 先発はポジション番号。リザーブは着番号。 */
   number: number;
   name: string;
-  /** 先発の着番号。括弧内の数字。 */
+  /** 先発の着番号。リザーブの背番号。 */
   shirt?: number;
   playerId?: string;
   captain?: boolean;
