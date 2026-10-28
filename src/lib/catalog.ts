@@ -569,7 +569,7 @@ export function buildSheetLineups(
     const shirt = positiveNumber(pick(row, index, ["着番号"]));
     const slot: LineupSlot = {
       unit,
-      number: unit === "R" ? (shirt ?? squadNumber ?? 0) : (squadNumber ?? shirt ?? 0),
+      number: unit === "R" ? (squadNumber ?? 0) : (squadNumber ?? shirt ?? 0),
       name,
       shirt,
       playerId: pick(row, index, ["PlayerID"]) || undefined,

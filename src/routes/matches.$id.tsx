@@ -140,7 +140,7 @@ function SlotRow({
   const body = (
     <>
       <span className="w-8 shrink-0 text-center font-display text-lg tabular-nums text-accent">
-        {slot.number}
+        {slot.number > 0 ? slot.number : null}
       </span>
       <span className="w-10 shrink-0 text-center text-xs tracking-wide text-muted-foreground">
         {position}

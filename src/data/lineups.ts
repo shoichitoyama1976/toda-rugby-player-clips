@@ -2,7 +2,7 @@ export type LineupUnit = "FW" | "BK" | "R" | "P";
 
 export type LineupSlot = {
   unit: LineupUnit;
-  /** 先発はポジション番号。リザーブは着番号。 */
+  /** シートの番号。リザーブで空なら 0。 */
   number: number;
   name: string;
   /** 先発の着番号。リザーブの背番号。 */
