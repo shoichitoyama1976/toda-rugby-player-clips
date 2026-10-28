@@ -149,8 +149,8 @@ function SlotRow({
         <span className="block text-base leading-snug">
           {label}
           {slot.captain ? <span className="text-accent">（C）</span> : null}
-          {aside ? <span className="text-muted-foreground"> （{aside}）</span> : null}
         </span>
+        {aside ? <span className="block text-sm leading-snug text-muted-foreground">{aside}</span> : null}
         {slot.shirt ? (
           <span className="text-[11px] text-muted-foreground">着番号 {slot.shirt}</span>
         ) : (
