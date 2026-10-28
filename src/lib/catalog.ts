@@ -342,7 +342,7 @@ export function classifyCsv(csv: string): CsvKind {
     aliases.some((alias) => headers.includes(normalizeHeader(alias)));
   if (has(["PlayerID"]) || (has(["出場"]) && has(["着番号"]))) return "lineups";
   if (has(["試合ID", "投稿URL"]) || has(["試合種別", "キックオフ", "着番号"])) return "matches";
-  if (has(["ポジション", "身長", "ふりがな"])) return "players";
+  if (has(["ポジション", "身長"]) && has(col("nameKana"))) return "players";
   if (has(["掲載年月日", "年月日", "掲載媒体"]) || (has(clipCol("title")) && has(clipCol("url")))) return "articles";
   if (has(col("name")) && !has(clipCol("title"))) return "players";
   return "unknown";

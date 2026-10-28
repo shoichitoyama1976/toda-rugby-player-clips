@@ -198,7 +198,7 @@ export const PLAYER_SHEET_COLUMNS = [
   { key: "sheetId", headers: ["ID", "id"], required: true, example: "22" },
   { key: "name", headers: ["名前", "氏名", "選手名", "name"], required: true, example: "土井將聖" },
   { key: "category", headers: ["属性", "区分"], required: false, example: "選手" },
-  { key: "nameKana", headers: ["ふりがな", "かな", "カナ", "フリガナ", "読み", "よみがな"], required: false, example: "どい まさとし" },
+  { key: "nameKana", headers: ["読み", "ふりがな", "かな", "カナ", "フリガナ", "よみがな"], required: false, example: "どい まさとし" },
   { key: "nickname", headers: ["ニックネーム", "愛称"], required: false, example: "" },
   {
     key: "sutoCall",
@@ -246,7 +246,7 @@ export const PLAYER_SHEET_COLUMNS = [
 ] as const;
 
 export const PLAYER_SHEET_TEMPLATE_CSV = [
-  "ID,名前,属性,ふりがな,ニックネーム,ポジション,身長,体重,国,出身地,ラグビースクール,高校,大学,経歴,生年月日,加入年度,退団年度",
+  "ID,名前,属性,読み,ニックネーム,ポジション,身長,体重,国,出身地,ラグビースクール,高校,大学,経歴,生年月日,加入年度,退団年度",
   "22,土井將聖,選手,どい まさとし,,WTB,173,80,JP,大阪府,,常翔啓光学園,立正大学,,1997-09-26,2020,",
 ].join("\n");
 
