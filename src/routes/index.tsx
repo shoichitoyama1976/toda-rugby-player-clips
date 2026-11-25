@@ -126,7 +126,11 @@ function Home() {
         </p>
       ) : null}
       {homeNote === "off" ? (
-        <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">オフシーズンです。</p>
+        <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
+          <Link to="/matches" className="text-accent hover:text-foreground">
+            過去の試合情報
+          </Link>
+        </p>
       ) : null}
 
       {upcomingMatch ? (
